@@ -8,5 +8,8 @@
    - Check: [09 checkability](principles/09-checkability.md)
    - Mass: [10 accidental volume](principles/10-accidental-volume.md)
 2. Turn the findings into a package of tiered instructions for coding agents and humans.
+
+   Package: [workflow/README.md](workflow/README.md). Human + agent planning surface: `product/` (schema in [workflow/artifacts.md](workflow/artifacts.md)). Worked example: this repo’s chat app.
+
 3. Define a metric that quantifies these findings and can be applied on any python code base. Lower score means cheaper to maintain.
 4. Implement that metric.
