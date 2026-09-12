@@ -12,4 +12,6 @@
    Package: [workflow/README.md](workflow/README.md). Human + agent planning surface: `product/` (schema in [workflow/artifacts.md](workflow/artifacts.md)). Worked example: this repo’s chat app.
 
 3. Define a metric that quantifies these findings and can be applied on any python code base. Lower score means cheaper to maintain.
+
+   Defined: [metric.md](metric.md). Combined \(W \in [0,5]\) from the ten atoms. Lower is cheaper.
 4. Implement that metric.

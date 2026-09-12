@@ -23,7 +23,7 @@ Setup for 1–9: a **registry of change axes** (not a full requirements matrix).
 
 **Headline scores use confirmed sites and labels.** A scanner floor is a lower bound. “Scanner found nothing” is not proof of zero.
 
-A single combined Python number (goal 3) is not defined here. These remain separate scores on different scales.
+Raw atoms remain separate (different scales). Combined \(W\): [../metric.md](../metric.md).
 
 ---
 
