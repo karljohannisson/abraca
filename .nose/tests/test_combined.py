@@ -1,4 +1,4 @@
-"""W composition (docs/metric.md v1)."""
+"""W composition (.nose/docs/metric.md v1)."""
 
 from maintainability.atoms import AtomTotals, AxisScore
 from maintainability.combined import combined

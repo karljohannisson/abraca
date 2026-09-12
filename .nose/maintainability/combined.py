@@ -1,4 +1,4 @@
-"""W from raw atoms. docs/metric.md version 1."""
+"""W from raw atoms. .nose/docs/metric.md version 1."""
 
 from __future__ import annotations
 

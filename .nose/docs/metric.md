@@ -6,10 +6,12 @@ The atoms stay the diagnosis. This file only says how they become one score \(W\
 
 ## Setup
 
-Required for atoms 1–9 and for \(W\):
+Required for atoms 1–9 and for \(W\) (paths are at the **product root**, not inside `.nose/`):
 
 - `product/axes.yaml` — locked axes with \(P\), shape, authority path, optional `verifies` and `extra_sites`
 - `product/entry-points.yaml` — program starts / public API; optional `code_roots`, `exclude`, `confirmed_live`
+
+CLI (from the product root): `PYTHONPATH=.nose python3 -m maintainability`.
 
 Without a registry, atoms 1–9 are undefined. Accidental volume can still run from entry-point defaults.
 
@@ -101,7 +103,7 @@ Equal group weight so Load’s four atoms do not outvote Orient’s one.
 
 ## Python application
 
-- Code roots: `entry-points.yaml` `code_roots` if set, else `src/` if present else `.`, plus `tests/` if present. `exclude` subtracts prefixes.
+- Code roots: `entry-points.yaml` `code_roots` if set, else `src/` if present else `.`, plus `tests/` if present. `exclude` subtracts prefixes. Do not parse `.nose/` as product code.
 - Strip a unique `src/` (or declared root) before package comparisons so `src/a` vs `src/b` is \(L=4\).
 - One deployable unless `deployables` lists path prefixes.
 - Statements: `ast.stmt` in the enclosing unit, recursing into `if`/`for`/`try` bodies, not into nested `def`/`class` (those are other units). \(T=15\).

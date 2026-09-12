@@ -4,8 +4,7 @@ code_roots:
   - src/chat
   - tests
 exclude:
-  - src/maintainability
-  - tests/metric
+  - .nose
 
 entry_points:
   - id: tui

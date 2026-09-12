@@ -10,7 +10,6 @@ dev = ["pytest"]
 
 [project.scripts]
 chat = "chat.__main__:main"
-maintainability = "maintainability.__main__:main"
 
 [build-system]
 requires = ["setuptools>=68"]

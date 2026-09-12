@@ -1,6 +1,6 @@
 # Tier 4 — Review
 
-Before claiming a slice done. Headline scores use **confirmed** sites ([principle 1](../principles/01-co-change-degree.md)). Run `python -m maintainability` and read [metric.md](../metric.md).
+Before claiming a slice done. Headline scores use **confirmed** sites ([principle 1](../principles/01-co-change-degree.md)). From the product root run `PYTHONPATH=.nose python3 -m maintainability` and read [metric.md](../metric.md).
 
 ## Agent
 

@@ -1,0 +1,16 @@
+[project]
+name = "nose-maintainability"
+version = "0.0.1"
+description = "Maintainability metric W for a product/ registry."
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+maintainability = "maintainability.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["maintainability*"]

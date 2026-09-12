@@ -2,4 +2,4 @@
 
 This folder is **this software**, not the methodology.
 
-Schema and field ownership: [docs/workflow/artifacts.md](../docs/workflow/artifacts.md). How to edit it: [docs/workflow/human.md](../docs/workflow/human.md).
+Schema and field ownership: [../.nose/docs/workflow/artifacts.md](../.nose/docs/workflow/artifacts.md). How to edit it: [../.nose/docs/workflow/human.md](../.nose/docs/workflow/human.md).

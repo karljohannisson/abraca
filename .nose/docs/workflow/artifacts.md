@@ -9,7 +9,7 @@ Per-repo planning surface. Not a requirements-to-code matrix. No `uses` links.
 | `product/entry-points.yaml` | Program starts and public API; optional `code_roots`, `exclude`, `confirmed_live`, `deployables` | Accidental-volume roots (with live authorities); which trees the metric parses |
 | `product/probes.md` | Open questions that would split, merge, or set shape | Unresolved planning only |
 
-`docs/principles/` is not product intent.
+`.nose/docs/principles/` is not product intent. It is part of the seed.
 
 ## Field ownership (`axes.yaml`)
 
@@ -47,19 +47,24 @@ extra_sites:
 
 Token-scan Name extras are detected in code and need not be listed. List Meaning and stronger, and any extra the scanner missed.
 
-`entry-points.yaml` optional keys: `code_roots` (path prefixes to parse), `exclude` (subtract), `confirmed_live` (static-dead but actually live), `deployables` (prefixes; default one deployable). Combined score: [metric.md](../metric.md).
+`entry-points.yaml` optional keys: `code_roots` (path prefixes to parse), `exclude` (subtract), `confirmed_live` (static-dead but actually live), `deployables` (prefixes; default one deployable). Combined score: [metric.md](../metric.md). Run from the product root: `PYTHONPATH=.nose python3 -m maintainability`.
 
 ## Generated repo layout
 
 ```
-AGENTS.md                 # points here
-docs/principles/          # atoms
-docs/workflow/            # this package
-product/                  # intent (human + agent)
+AGENTS.md                 # thin; points at .nose/
+.nose/                    # seed (copy this)
+  README.md
+  docs/principles/
+  docs/workflow/
+  docs/metric.md
+  maintainability/        # python -m maintainability
+  tests/                  # tests for the metric, not the product
+product/                  # THIS software
   requirements.md
   axes.yaml
   entry-points.yaml
   probes.md
-src/                      # one package; authority paths in axes.yaml
-tests/                    # verifies listed in axes.yaml
+src/<name>/               # authorities
+tests/                    # product verifies
 ```

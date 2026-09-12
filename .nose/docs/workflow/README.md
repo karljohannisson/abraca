@@ -6,13 +6,15 @@ Do not copy principle metric formulas here. Those stay in `docs/principles/`. Co
 
 ## Two kinds of files
 
+The **seed** is [`.nose/`](../../README.md) plus the root `AGENTS.md`. Everything else at the product root is the software being built.
+
 | Kind | Where | Role |
 |---|---|---|
-| **Instruction package** | `docs/principles/`, `docs/workflow/`, `AGENTS.md` | How to work. Same in every repo that uses this workflow. |
-| **Product intent** | `product/` | What *this* software is, and which reasons it is designed to absorb. |
-| **Code** | `src/`, `tests/` | Authorities named in the axes file; `verifies` tests. |
+| **Seed** | `.nose/` (`docs/`, `maintainability/`, metric `tests/`) and root `AGENTS.md` | How to work. Copy into every repo that uses this workflow. |
+| **Product intent** | `product/` at the **product root** | What *this* software is, and which reasons it is designed to absorb. |
+| **Product code** | `src/`, `tests/` at the product root | Authorities named in the axes file; `verifies` tests. |
 
-This mothership also has [docs/goals.md](../goals.md). A generated product repo copies the instruction package, then has its own `product/` + `src/`.
+This mothership also has [docs/goals.md](../goals.md) (how the seed itself was built). A generated product repo copies `.nose/` + `AGENTS.md`, then has its own `product/` + `src/`.
 
 Schema of `product/*`: [artifacts.md](artifacts.md).
 

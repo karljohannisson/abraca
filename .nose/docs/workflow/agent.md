@@ -30,7 +30,7 @@ When you add a test that verifies an axis, append it to that row’s `verifies` 
 
 ## Score
 
-After a slice, run `python -m maintainability` (see [metric.md](../metric.md)). Report headline \(W\) and the ten raw atoms. Do not claim \(k=1\) from the floor. If headline \(W\) rose, say which atom and fix or ask.
+After a slice, from the product root run `PYTHONPATH=.nose python3 -m maintainability` (see [metric.md](../metric.md)). Report headline \(W\) and the ten raw atoms. Do not claim \(k=1\) from the floor. If headline \(W\) rose, say which atom and fix or ask.
 
 ## Mass
 

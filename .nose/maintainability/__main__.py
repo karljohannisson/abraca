@@ -1,4 +1,4 @@
-"""CLI: python -m maintainability [--root DIR] [--json]."""
+"""CLI: PYTHONPATH=.nose python3 -m maintainability [--root DIR] [--json]."""
 
 from __future__ import annotations
 
