@@ -1,32 +1,41 @@
 # Tier 0 — Human
 
-You maintain **what the software is** and **which changes it must absorb**. You do not have to name files, list tests, or compute scores.
+You know the product. You do not need to know software.
 
-## You write
+You **talk**. The agent writes every file under `product/`. You never have to open yaml, name a module, pick a test, or read a score.
 
-1. **Brief** in `product/requirements.md` — what it is, who uses it, current slice.
-2. **Frozen** in the same file — decisions that will not change, or that you refuse to design for.
-3. **Axes** in `product/axes.yaml` — each live reason: id, short statement, `p`, `shape`, `status`.
-4. **Answers** in `product/probes.md` — independence, expectability, shape. Then the agent folds answers into yaml and deletes the resolved probe.
+## You say
 
-Entry points: confirm the agent’s list (what is the program / public API).
+- What it is, who uses it, what “working” means for now.
+- What might change in your world later (vendors, channels, prices, languages, how people talk to it, how you store things, …).
+- Optional: **“this should be a change axis because …”** — a reason you want the software to absorb without a rewrite. You do not have to find all of them. The agent will suggest others.
+- **Yes / no / later / never** to the agent’s recap and to bets you did not name.
+- Mind changes, in ordinary language: “also Slack”, “history on disk”, “we will never do X”.
 
-## You confirm (do not author from scratch)
+## You answer questions in your language
 
-- Clustering of \(r\): one event vs two axes; merge if they cannot change alone.
-- Authority when several encodings exist.
-- Extra sites the agent found that are not the same tokens.
-- Dead vs plugin-live code.
+The agent will ask things like:
 
-“Scanner found nothing” is not your sign-off on \(k=1\) or \(u=0\).
+- Could A happen without B?
+- Is this something you expect, a maybe, or basically never?
+- When it happens, is it another one of the same kind, or a different kind of thing?
+- Make room now, remember it but don’t build it, or treat it as off the table?
+- Is this the same program, or a separate product?
+
+You do not have to know what an API protocol is. If the agent infers something technical, they must explain it as a bet in your words (“a new company is not always a new kind of connection”) and wait.
+
+## You confirm
+
+The recap in ordinary language: what it is, this version, what is off the table, what can change independently, what is later. That is the lock.
+
+You do **not** confirm extra copies in the code, dead code, or that a scanner is clean. That is the agent’s job.
 
 ## You do not
 
-- Fill a requirements-to-code matrix or `uses` map.
-- Enumerate every feature as an axis (features are the brief; axes are *independent expectable changes*).
-- Pick library folders unless you are overriding an authority.
-- Ask the agent to build a framework for a `dormant` or frozen reason.
+- Edit `product/axes.yaml` or any other intent file (unless you want to; the agent still owns the schema).
+- List every feature as an axis. Features are the brief. Axes are independent things that can change.
+- Ask for a framework for something you said later or never.
 
-## When the product changes
+## When you change your mind
 
-Edit the brief and the affected rows (add / split / freeze / change `p` or `shape`). The next agent turn starts at [planning](planning.md) until `product/` matches.
+Say it. The next turn the agent updates the recap and the files, then the code. You should not have to know whether that is “a new member” or “a new axis”; they will ask one question if it matters.

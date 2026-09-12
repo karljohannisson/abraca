@@ -1,6 +1,8 @@
 # Tier 3 — Implementing
 
-Code against locked axes. Principles: [map](../principles/README.md).
+Input: [handoff.md](handoff.md) must already be true. If a locked row lacks authority path or shape, or Frozen disagrees with the last recap, return to [planning.md](planning.md). Do not invent axes.
+
+Code against **locked** axes, including `origin: inferred`. Principles: [map](../principles/README.md).
 
 ## Edit (1–3)
 
@@ -30,6 +32,6 @@ Code against locked axes. Principles: [map](../principles/README.md).
 
 ## Slice discipline
 
-Implement the current slice in `requirements.md`. A locked low-\(P\) port may exist as a trivial first member (e.g. in-memory history). A `dormant` axis has **no** code.
+Implement the current slice in `requirements.md`. A locked low-\(P\) port may exist as a trivial first member (e.g. in-memory history). A `dormant` axis has **no** code. Frozen is not a secret second slice.
 
 After the slice compiles and `verifies` pass, run `PYTHONPATH=.nose python3 -m maintainability`. Prefer not to raise headline \(W\). Recopying tokens in tests raises degree (and usually locality).

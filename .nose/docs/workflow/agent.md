@@ -1,13 +1,19 @@
 # Tier 1 — Agent, always on
 
-Read [artifacts.md](artifacts.md) once per repo. Load `product/requirements.md` and `product/axes.yaml` before editing code.
+Read [../README.md](../README.md) once. Read [artifacts.md](artifacts.md) once per repo. If `product/` is missing or stale vs the human’s last message: [bootstrap.md](bootstrap.md) / [planning.md](planning.md) **before code**.
+
+## How you talk
+
+- Domain language. Explain inferred bets as ordinary sentences with a because.
+- Never ask the human to edit yaml, name modules, classify extra sites, or interpret \(W\).
+- After any agreement, update `product/` in the same turn ([README](README.md) collaboration rule).
 
 ## Intent lives in `product/`
 
 - Implement the **current slice** in `requirements.md`.
-- Design only for **locked** rows in `axes.yaml`.
+- Design only for **locked** rows in `axes.yaml`. Inferred locked rows are first-class; do not skip them because the human did not name them.
 - Do not encode a reason that is frozen, dormant, proposed, or missing.
-- After any planning agreement, update `product/` in the same turn ([README](README.md) collaboration rule).
+- `origin` / `because` / `plain` are for you and the recap. The scorer ignores them.
 
 ## One authority per locked \(r\)
 
@@ -30,7 +36,7 @@ When you add a test that verifies an axis, append it to that row’s `verifies` 
 
 ## Score
 
-After a slice, from the product root run `PYTHONPATH=.nose python3 -m maintainability` (see [metric.md](../metric.md)). Report headline \(W\) and the ten raw atoms. Do not claim \(k=1\) from the floor. If headline \(W\) rose, say which atom and fix or ask.
+After a slice, from the product root run `PYTHONPATH=.nose python3 -m maintainability` (see [metric.md](../metric.md)). Report headline \(W\) and the ten raw atoms. Translate for the human: one sentence if \(W\) moved (“we copied a list into two places; I will fix that”). Do not claim \(k=1\) from the floor. If headline \(W\) rose, fix or ask a **product** question, not a metrics question.
 
 ## Mass
 
