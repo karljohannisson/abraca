@@ -2,6 +2,8 @@
 
 **Status:** locked.
 
+**Group.** Mass — standing search tax from code that should not exist. Map: [README](README.md).
+
 **Property.** How much code exists that is not reachable from declared entry points — mass that is not serving any live behavior.
 
 **Direction.** Less unreachable mass → cheaper and less risky. More → more expensive and more risky (search tax, false findability peaks, load of dead paths).

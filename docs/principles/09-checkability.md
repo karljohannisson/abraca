@@ -2,6 +2,8 @@
 
 **Status:** locked.
 
+**Group.** Check — cost/risk of knowing the edit worked. Map: [README](README.md).
+
 **Property.** After an edit to \(r\), how much of “we missed something or broke a dependent” is caught mechanically, without a hunt.
 
 **Direction.** Authority-driven checks and fail-loud uses → cheaper and less risky. Silence → more expensive and more risky.
@@ -19,6 +21,11 @@ Retest *labor* (how many tests import the module) is a diagnostic, not the headl
 \]
 
 Lower is cheaper.
+
+| Symbol | Meaning |
+|---|---|
+| \(r\), \(P(r)\), authority | Same registry as principle 1 |
+| \(V(r)\) | Miss-risk ordinal in \(\{0,1,2,3\}\) |
 
 | \(V\) | After editing the authority for this \(r\) |
 |---|---|

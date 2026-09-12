@@ -2,6 +2,8 @@
 
 **Status:** locked.
 
+**Group.** Orient — cost of landing on the right first place. Map: [README](README.md).
+
 **Property.** Cost to land on the **authority** for a reason (or, for a defect, on the encoding that is wrong), starting from a statement of that reason — not from the registry pointer.
 
 **Direction.** The authority is the unique obvious hit → cheaper and less risky. Buried, misnamed, or out-ranked by clones → more expensive and more risky.

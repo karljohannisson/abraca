@@ -2,6 +2,8 @@
 
 **Status:** locked.
 
+**Group.** Load. Map: [README](README.md).
+
 **Property.** How many *other* live change axes have a representation in the same enclosing unit as this site.
 
 **Direction.** One reason per unit → cheaper and less risky. More live reasons in the same unit → more expensive and more risky.

@@ -2,6 +2,8 @@
 
 **Status:** locked.
 
+**Group.** Load. Map: [README](README.md).
+
 **Property.** How much *same-repo* knowledge you must understand **but not edit** in order to change a site.
 
 **Direction.** Thinner, encapsulated collaborators → cheaper and less risky. Broader leaked graph → more expensive and more risky.

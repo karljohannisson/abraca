@@ -2,6 +2,8 @@
 
 **Status:** locked.
 
+**Group.** Load. Map: [README](README.md).
+
 **Property.** How much control-flow and nesting sit inside the enclosing unit of a representation — how gnarly that one local edit is.
 
 **Direction.** Straighter → cheaper and less risky. More branching, nesting, and state-twisting → more expensive and more risky.

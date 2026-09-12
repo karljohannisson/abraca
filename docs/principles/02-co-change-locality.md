@@ -2,13 +2,15 @@
 
 **Status:** locked.
 
+**Group.** Edit. Map: [README](README.md).
+
 **Property.** For a single reason to change, how far apart the edit sites sit in the program’s containment tree (function ⊂ type ⊂ module ⊂ package ⊂ deployable).
 
 **Direction.** Closer → cheaper and less risky. More spread → more expensive and more risky.
 
 **Principle.** A codebase is cheaper to maintain when the sites that must change together live as close together as the language’s nesting allows.
 
-This is **locality** only. Not included: how many sites, strength/implicitness of the dependency, how hard each local edit is, findability, proof of completeness, or who owns the files.
+This is **locality** only. Not included: how many sites ([degree](01-co-change-degree.md)), [strength](03-co-change-strength.md), how hard each local edit is ([size](04-intra-site-size.md), [complexity](05-intra-site-complexity.md)), [findability](08-findability.md), [checkability](09-checkability.md), or who owns the files.
 
 When \(k(r)=1\), spread is zero. Locality only has cost once principle 1 has extra sites.
 
@@ -75,7 +77,7 @@ If you only have the mechanical **floor** for \(k\), \(L\) is a **lower bound** 
 ## What does not count
 
 - Call sites of the authority (not representations).
-- Line distance inside a module (working-set, if taken later).
+- Line distance inside a module ([size](04-intra-site-size.md) of the enclosing unit, not this).
 - Import-graph hops (different topology).
 - Git co-change (proxy for unknown \(r\), not this).
 - Team/ownership.
@@ -83,7 +85,7 @@ If you only have the mechanical **floor** for \(k\), \(L\) is a **lower bound** 
 
 ## What is *not* a violation
 
-- One large module that holds a single reason. That may hurt a later working-set principle and score well here.
+- One large module that holds a single reason. That may hurt [size](04-intra-site-size.md) / [complexity](05-intra-site-complexity.md) and score well here.
 - Independently evolving similar code that you *should not* colocate. Forcing those together raises future co-change degree for *different* \(r\).
 
 ## Aliases (not extra principles)

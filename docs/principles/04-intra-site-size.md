@@ -2,6 +2,8 @@
 
 **Status:** locked.
 
+**Group.** Load — cost of holding the local edit in mind. Map: [README](README.md).
+
 **Property.** How large the *enclosing unit* of a representation is — how much text you must load to edit that one site.
 
 **Direction.** Smaller → cheaper and less risky. Larger → more expensive and more risky.

@@ -2,13 +2,15 @@
 
 **Status:** locked.
 
+**Group.** Edit. Map: [README](README.md).
+
 **Property.** For a single reason to change, how *implicit* the agreement is among the sites that must move together — Page-Jones’s scale of form, not how many sites or how far apart they are.
 
 **Direction.** Weaker / more explicit → cheaper and less risky. Stronger / more implicit → more expensive and more risky.
 
 **Principle.** A codebase is cheaper to maintain when the sites that share a reason to change agree in a form you can see and rename, not in a form you have to infer.
 
-This is **strength** only. Not included: how many sites, distance between sites, how hard each local edit is, findability, proof of completeness, or fan-in as edge count.
+This is **strength** only. Not included: how many sites ([degree](01-co-change-degree.md)), distance ([locality](02-co-change-locality.md)), how hard each local edit is ([size](04-intra-site-size.md), [complexity](05-intra-site-complexity.md)), [findability](08-findability.md), [checkability](09-checkability.md), or fan-in as edge count.
 
 When \(k(r)=1\), there is no inter-site agreement to score. Strength only has cost once principle 1 has extra sites.
 
@@ -94,7 +96,7 @@ Call-site positional coupling is this principle **for a different** \(r\): “pa
 ## What is *not* a violation
 
 - **Uses** of a single authority — name coupling to the authority is the intended weak form.
-- One site that internally uses a strong form (a positional tuple inside the country table). That is the encoding’s local shape; a later intra-site principle may care.
+- One site that internally uses a strong form (a positional tuple inside the country table). That is the encoding’s local shape; [size](04-intra-site-size.md) / [complexity](05-intra-site-complexity.md) may care.
 - Independently evolving values that only look related. Treating them as connascent *invents* an \(r\) and can raise future degree.
 
 ## Aliases (not extra principles)

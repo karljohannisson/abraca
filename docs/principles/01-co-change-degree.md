@@ -2,13 +2,15 @@
 
 **Status:** locked.
 
+**Group.** Edit — cost of actually changing the representations of one reason. Map: [README](README.md).
+
 **Property.** For a single reason to change, how many distinct *representations* of that knowledge must be edited.
 
 **Direction.** Fewer representations → cheaper and less risky. More → more expensive and more risky.
 
 **Principle.** A codebase is cheaper to maintain when each reason to change maps to as few edit sites as possible — ideally one.
 
-This is **degree** only. Not included: distance between sites, strength/implicitness of the dependency, how hard each local edit is, findability, or proof of completeness.
+This is **degree** only. Not included: [locality](02-co-change-locality.md), [strength](03-co-change-strength.md), [size](04-intra-site-size.md), [complexity](05-intra-site-complexity.md), [mixing](06-concern-mixing.md), [comprehension coupling](07-comprehension-coupling.md), [findability](08-findability.md), [checkability](09-checkability.md).
 
 ## Score
 
