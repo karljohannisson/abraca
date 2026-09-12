@@ -110,6 +110,18 @@ Equal group weight so Load’s four atoms do not outvote Orient’s one.
 - Cognitive complexity: Sonar/Campbell on that unit (see implementation).
 - Findability query: identifier-style tokens from `statement` and `id`, stopwords dropped; do not add the authority path.
 - Live authorities are reachability roots. `verifies` tests are not unreachable. `confirmed_live` paths are not unreachable.
+- `origin`, `plain`, `because` on an axis are ignored. They are planning fields ([workflow/artifacts.md](workflow/artifacts.md)).
+
+## What \(W\) can claim without a software human
+
+Goal 3 is the backstop for [workflow/review.md](workflow/review.md) when the driver is a non-software person.
+
+- The registry may be **entirely agent-authored**. Scoring does not care who typed the yaml.
+- **Floor** is automatic (authority + token-scan Name extras). The agent must not claim \(k=1\) or “no extras” from the floor.
+- **Headline** extras of Meaning+ need a hunt. The human is **not** a site classifier. Treat hunt hits as **defects to delete**, not as yaml for the human to confirm. `extra_sites` with `status: confirmed` is only for a software collaborator who is keeping an extra this slice.
+- `confirmed_live` is the one metric field that may need a **product** question (“do you still use the extra-commands plugin?”), never a metrics question.
+- Translate \(W\) for the human in one sentence if it moved. Do not ask them to interpret atoms, caps, or groups.
+- A slice is **claimable** without a software reviewer when verifies pass, hunt hits are gone, dormant/frozen code is absent, and headline \(W\) did not rise (or the rise is explained in domain language). That is how 3 makes 2 trustable without someone looking at sites.
 
 ## Not \(W\)
 
