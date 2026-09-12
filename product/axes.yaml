@@ -1,13 +1,16 @@
 # Live and dormant change axes. Field ownership: .nose/docs/workflow/artifacts.md
-# Members live in code, not here.
+# Members live in code, not here. Agent-written; human accepted the recap.
 
 version: 1
 
 axes:
   - id: providers
+    plain: We may add more LLM companies.
     statement: >-
       The set of LLM API providers may grow (OpenRouter, OpenAI, Anthropic).
       A new vendor may reuse an existing protocol.
+    because: The brief named OpenRouter now and other vendors later.
+    origin: brief
     p: high
     shape: set_grows
     status: locked
@@ -19,8 +22,13 @@ axes:
     note: OpenRouter is the first member, not its own axis.
 
   - id: protocols
+    plain: A new company is not always a new kind of connection.
     statement: >-
       The set of chatbot API protocols may grow (OpenAI-style, others).
+    because: >-
+      Vendors often share a wire dialect; protocol can change without a new
+      vendor, and a new vendor can reuse an existing protocol.
+    origin: inferred
     p: medium
     shape: new_variant
     status: locked
@@ -31,9 +39,12 @@ axes:
       - tests/test_protocol.py
 
   - id: chat-contract
+    plain: Other screens in the same program may talk to chat later.
     statement: >-
       The set of in-process consumers of the chat interface may grow
       (TUI now; other Python UIs later).
+    because: Same program, more ways in; not a second product.
+    origin: brief
     p: high
     shape: set_grows
     status: locked
@@ -45,7 +56,10 @@ axes:
     note: TUI is a use of this port, not an encoding of the consumer set.
 
   - id: tui-commands
+    plain: The terminal app may gain more commands and keys.
     statement: The set of TUI commands and keybindings may grow.
+    because: Commands can grow without changing how stats or colors work.
+    origin: brief
     p: medium
     shape: set_grows
     status: locked
@@ -56,7 +70,10 @@ axes:
       - tests/test_commands.py
 
   - id: tui-stats
+    plain: The terminal app may show more live numbers.
     statement: The set of stats shown in the TUI may grow.
+    because: Stats can grow without new commands or a layout rewrite.
+    origin: brief
     p: medium
     shape: set_grows
     status: locked
@@ -67,8 +84,11 @@ axes:
       - tests/test_stats.py
 
   - id: tui-presentation
+    plain: How the terminal looks (layout, colors, wording) may change.
     statement: >-
       TUI layout, colors, text formatting, and scrolling may change.
+    because: Look-and-feel is not a new command and not a new statistic.
+    origin: brief
     p: medium
     shape: formula_value
     status: locked
@@ -79,8 +99,11 @@ axes:
       - tests/test_presentation.py
 
   - id: tool-calling
+    plain: The bot may gain tools it can call.
     statement: >-
       Tools may be added; the message model must represent tool calls and results.
+    because: Tools are not the same as pictures or other message parts.
+    origin: brief
     p: high
     shape: new_variant
     status: locked
@@ -91,7 +114,10 @@ axes:
       - tests/test_tools.py
 
   - id: multimodal
+    plain: Messages may include more than text (images, etc.).
     statement: Message content may include non-text parts.
+    because: A new part type is not a new tool.
+    origin: brief
     p: medium
     shape: new_variant
     status: locked
@@ -102,7 +128,10 @@ axes:
       - tests/test_content.py
 
   - id: history
+    plain: Where past messages live may change.
     statement: History storage may be added or changed.
+    because: Saving the thread is not the same as caching model answers.
+    origin: brief
     p: low
     shape: new_variant
     status: locked
@@ -114,7 +143,10 @@ axes:
     note: In-memory first member only this slice. No file/db backend.
 
   - id: cache
+    plain: We might remember some answers later; we do not know what yet.
     statement: Caching may be added.
+    because: Mentioned as possible; the thing cached is unknown, so no code.
+    origin: inferred
     p: low
     shape: unknown
     status: dormant
@@ -123,7 +155,10 @@ axes:
     note: No module until we know what is cached.
 
   - id: credentials
+    plain: How we keep API keys may change.
     statement: How API keys are stored may change.
+    because: Keys are not the vendor list and not the message history.
+    origin: brief
     p: high
     shape: new_variant
     status: locked
@@ -135,9 +170,12 @@ axes:
     note: Env-var backend is the first variant.
 
   - id: model-discovery
+    plain: How the user picks a model name may change.
     statement: >-
       How the user finds a model id may change (type a string now;
       later fetch-and-search from the provider).
+    because: Finding a model is not the same as adding a vendor.
+    origin: brief
     p: medium
     shape: new_variant
     status: locked

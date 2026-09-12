@@ -18,6 +18,11 @@ def test_axes_yaml_has_locked_providers() -> None:
     assert providers["p"] == "high"
     assert providers["authority"]["symbol"] == "chat.api.providers"
     assert "tests/test_providers.py" in providers["verifies"]
+    assert providers["origin"] == "brief"
+    protocols = next(a for a in data["axes"] if a["id"] == "protocols")
+    assert protocols["origin"] == "inferred"
+    assert "plain" in protocols
+    assert "because" in protocols
 
 
 def test_registry_skips_dormant_cache() -> None:

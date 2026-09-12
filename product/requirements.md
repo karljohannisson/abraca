@@ -2,6 +2,8 @@
 
 In-process chat with LLM chatbots. A TUI is the first consumer. Other in-process UIs may be added later; they import the chat port (they are not a second deployable).
 
+Agent-drafted from the brief; the human accepted the recap. `protocols` was inferred (a new company is not always a new kind of connection).
+
 ## Current slice
 
 **0 — authorities.** Modules exist at the paths in `axes.yaml`, with first members/variants only: OpenRouter, OpenAI-compat, env credentials, text parts, tool-call ADT, in-memory history, model as string, TUI command/stat/presentation placeholders. No `cache` module.
