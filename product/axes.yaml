@@ -1,0 +1,149 @@
+# Live and dormant change axes. Field ownership: docs/workflow/artifacts.md
+# Members live in code, not here.
+
+version: 1
+
+axes:
+  - id: providers
+    statement: >-
+      The set of LLM API providers may grow (OpenRouter, OpenAI, Anthropic).
+      A new vendor may reuse an existing protocol.
+    p: high
+    shape: set_grows
+    status: locked
+    authority:
+      symbol: chat.api.providers
+      path: src/chat/api/providers.py
+    verifies:
+      - tests/test_providers.py
+    note: OpenRouter is the first member, not its own axis.
+
+  - id: protocols
+    statement: >-
+      The set of chatbot API protocols may grow (OpenAI-style, others).
+    p: medium
+    shape: new_variant
+    status: locked
+    authority:
+      symbol: chat.api.protocol
+      path: src/chat/api/protocol.py
+    verifies:
+      - tests/test_protocol.py
+
+  - id: chat-contract
+    statement: >-
+      The set of in-process consumers of the chat interface may grow
+      (TUI now; other Python UIs later).
+    p: high
+    shape: set_grows
+    status: locked
+    authority:
+      symbol: chat.port
+      path: src/chat/port.py
+    verifies:
+      - tests/test_port.py
+    note: TUI is a use of this port, not an encoding of the consumer set.
+
+  - id: tui-commands
+    statement: The set of TUI commands and keybindings may grow.
+    p: medium
+    shape: set_grows
+    status: locked
+    authority:
+      symbol: chat.tui.commands
+      path: src/chat/tui/commands.py
+    verifies:
+      - tests/test_commands.py
+
+  - id: tui-stats
+    statement: The set of stats shown in the TUI may grow.
+    p: medium
+    shape: set_grows
+    status: locked
+    authority:
+      symbol: chat.tui.stats
+      path: src/chat/tui/stats.py
+    verifies:
+      - tests/test_stats.py
+
+  - id: tui-presentation
+    statement: >-
+      TUI layout, colors, text formatting, and scrolling may change.
+    p: medium
+    shape: formula_value
+    status: locked
+    authority:
+      symbol: chat.tui.presentation
+      path: src/chat/tui/presentation.py
+    verifies:
+      - tests/test_presentation.py
+
+  - id: tool-calling
+    statement: >-
+      Tools may be added; the message model must represent tool calls and results.
+    p: high
+    shape: new_variant
+    status: locked
+    authority:
+      symbol: chat.tools
+      path: src/chat/tools.py
+    verifies:
+      - tests/test_tools.py
+
+  - id: multimodal
+    statement: Message content may include non-text parts.
+    p: medium
+    shape: new_variant
+    status: locked
+    authority:
+      symbol: chat.content
+      path: src/chat/content.py
+    verifies:
+      - tests/test_content.py
+
+  - id: history
+    statement: History storage may be added or changed.
+    p: low
+    shape: new_variant
+    status: locked
+    authority:
+      symbol: chat.history
+      path: src/chat/history.py
+    verifies:
+      - tests/test_history.py
+    note: In-memory first member only this slice. No file/db backend.
+
+  - id: cache
+    statement: Caching may be added.
+    p: low
+    shape: unknown
+    status: dormant
+    authority: null
+    verifies: []
+    note: No module until we know what is cached.
+
+  - id: credentials
+    statement: How API keys are stored may change.
+    p: high
+    shape: new_variant
+    status: locked
+    authority:
+      symbol: chat.credentials
+      path: src/chat/credentials.py
+    verifies:
+      - tests/test_credentials.py
+    note: Env-var backend is the first variant.
+
+  - id: model-discovery
+    statement: >-
+      How the user finds a model id may change (type a string now;
+      later fetch-and-search from the provider).
+    p: medium
+    shape: new_variant
+    status: locked
+    authority:
+      symbol: chat.api.models
+      path: src/chat/api/models.py
+    verifies:
+      - tests/test_models.py
+    note: Do not encode a closed catalog of model names.
