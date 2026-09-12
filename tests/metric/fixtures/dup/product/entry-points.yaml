@@ -1,0 +1,8 @@
+code_roots:
+  - src
+  - tests
+entry_points:
+  - id: main
+    symbol: app.__main__:main
+    path: src/app/__main__.py
+    kind: program_start

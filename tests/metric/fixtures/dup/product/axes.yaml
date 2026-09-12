@@ -1,0 +1,16 @@
+version: 1
+axes:
+  - id: countries
+    statement: The set of country codes may grow.
+    p: high
+    shape: set_grows
+    status: locked
+    authority:
+      symbol: app.countries
+      path: src/app/countries.py
+    verifies:
+      - tests/test_countries.py
+    extra_sites:
+      - path: src/app/clone.py
+        status: confirmed
+        strength: meaning

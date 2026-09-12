@@ -15,3 +15,5 @@
 
    Defined: [metric.md](metric.md). Combined \(W \in [0,5]\) from the ten atoms. Lower is cheaper.
 4. Implement that metric.
+
+   CLI: `python -m maintainability` (`src/maintainability/`). Stdlib only. Setup is `product/`.
