@@ -1,17 +1,14 @@
 # Tier 4 — Review
 
-Before claiming a slice done. Headline scores use **confirmed** sites ([principle 1](../principles/01-co-change-degree.md)).
+Before claiming a slice done. Headline scores use **confirmed** sites ([principle 1](../principles/01-co-change-degree.md)). Run `python -m maintainability` and read [metric.md](../metric.md).
 
 ## Agent
 
-1. For each locked \(r\) touched this slice: hunt extra encodings (same tokens, then synonyms). List hits under `extra_sites` as `proposed`.
-2. Check mixing: one enclosing unit, one live \(r\) encoded.
-3. Check `verifies` bind the authority (read, not recopy) and fail-loud where `shape` requires it. Yaml `verifies` lists match the tests.
-4. Check names vs statements (findability).
-5. Check reachability from `entry-points.yaml` + live authorities.
-6. Confirm no code for dormant/frozen reasons.
+1. Run the metric. Record headline \(W\), floor \(W\), and the ten raw atoms.
+2. For each locked \(r\) touched this slice: hunt extra encodings (same tokens, then synonyms). List hits under `extra_sites` as `proposed`. Promote to `confirmed` after the human agrees, or delete the extra in code.
+3. Check mixing, `verifies` (read, not recopy), fail-loud, findability, reachability, no dormant/frozen code — the metric covers the automatic parts; the hunt covers Meaning+.
 
-If a hunt finds extras, fix them (move knowledge to the authority) or stop and ask; do not report \(k=1\) with known extras.
+If a hunt finds extras, fix them or stop and ask. Do not report \(k=1\) because the floor said so.
 
 ## Human
 

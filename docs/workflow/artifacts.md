@@ -6,7 +6,7 @@ Per-repo planning surface. Not a requirements-to-code matrix. No `uses` links.
 |---|---|---|
 | `product/requirements.md` | Product brief, frozen decisions, **current slice** | What to build now; what must not be designed for |
 | `product/axes.yaml` | Live and dormant change axes | \(r\), \(P\), shape, authority, `verifies` |
-| `product/entry-points.yaml` | Program starts and public API | Accidental-volume roots (with live authorities) |
+| `product/entry-points.yaml` | Program starts and public API; optional `code_roots`, `exclude`, `confirmed_live`, `deployables` | Accidental-volume roots (with live authorities); which trees the metric parses |
 | `product/probes.md` | Open questions that would split, merge, or set shape | Unresolved planning only |
 
 `docs/principles/` is not product intent.
@@ -18,7 +18,7 @@ Per-repo planning surface. Not a requirements-to-code matrix. No `uses` links.
 | `id`, `statement`, `p`, `shape`, `status` | Human (agent may **draft** from a brief) | Human |
 | `authority.symbol`, `authority.path` | Agent proposes | Human, when it matters (competing encodings) |
 | `verifies` | Agent writes tests and lists them | Human on review if a test recopies |
-| `extra_sites` | Agent hunts | Human; scanner floor is not headline \(k=1\) |
+| `extra_sites` | Agent hunts (path, `strength`, `status`) | Human; only `status: confirmed` enter headline \(k\). Scanner floor is not headline \(k=1\) |
 
 `status`: `proposed` (drafted, not agreed) · `locked` (design for it) · `dormant` (declared, do **not** implement until shape is known).
 
@@ -35,6 +35,19 @@ Per-repo planning surface. Not a requirements-to-code matrix. No `uses` links.
 | `unknown` | Only with `status: dormant`. |
 
 Exactly one `authority` per locked row. Do not hand-maintain member lists in yaml; members live in the authority in code.
+
+`extra_sites` (optional, on a locked row):
+
+```yaml
+extra_sites:
+  - path: src/foo.py          # file containing a confirmed extra encoding
+    status: confirmed         # proposed | confirmed
+    strength: meaning         # name | meaning | position | algorithm | dynamic
+```
+
+Token-scan Name extras are detected in code and need not be listed. List Meaning and stronger, and any extra the scanner missed.
+
+`entry-points.yaml` optional keys: `code_roots` (path prefixes to parse), `exclude` (subtract), `confirmed_live` (static-dead but actually live), `deployables` (prefixes; default one deployable). Combined score: [metric.md](../metric.md).
 
 ## Generated repo layout
 

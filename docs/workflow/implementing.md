@@ -31,3 +31,5 @@ Code against locked axes. Principles: [map](../principles/README.md).
 ## Slice discipline
 
 Implement the current slice in `requirements.md`. A locked low-\(P\) port may exist as a trivial first member (e.g. in-memory history). A `dormant` axis has **no** code.
+
+After the slice compiles and `verifies` pass, run `python -m maintainability`. Prefer not to raise headline \(W\). Recopying tokens in tests raises degree (and usually locality).

@@ -28,6 +28,10 @@ The authority’s qualified name and first docstring line must use tokens from t
 
 When you add a test that verifies an axis, append it to that row’s `verifies` in the same change.
 
+## Score
+
+After a slice, run `python -m maintainability` (see [metric.md](../metric.md)). Report headline \(W\) and the ten raw atoms. Do not claim \(k=1\) from the floor. If headline \(W\) rose, say which atom and fix or ask.
+
 ## Mass
 
 No code that is not reachable from `product/entry-points.yaml` plus live authorities. No speculative helpers “for later.”

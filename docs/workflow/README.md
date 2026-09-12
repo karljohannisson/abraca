@@ -2,7 +2,7 @@
 
 Goal 2: tiered instructions so a human can maintain **requirements** and **change axes**, and a coding agent can implement as cheaply as the locked [principles](../principles/README.md) allow.
 
-Do not copy principle metric formulas here. Those stay in `docs/principles/`. This package says **who does what, in which file, in which order**.
+Do not copy principle metric formulas here. Those stay in `docs/principles/`. Combined \(W\): [../metric.md](../metric.md). This package says **who does what, in which file, in which order**.
 
 ## Two kinds of files
 

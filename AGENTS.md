@@ -7,4 +7,4 @@ This repo uses the maintainability workflow.
 3. If intent is stale vs the human’s last message: [docs/workflow/planning.md](docs/workflow/planning.md) before code.
 4. Then [docs/workflow/implementing.md](docs/workflow/implementing.md) and [docs/workflow/review.md](docs/workflow/review.md).
 
-Principles (metrics and definitions): [docs/principles/README.md](docs/principles/README.md). Layout and field ownership: [docs/workflow/README.md](docs/workflow/README.md).
+Principles: [docs/principles/README.md](docs/principles/README.md). Combined score \(W\): [docs/metric.md](docs/metric.md) — run `python -m maintainability` at review. Layout: [docs/workflow/README.md](docs/workflow/README.md).
