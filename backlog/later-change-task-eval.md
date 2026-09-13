@@ -1,6 +1,6 @@
 # Two later change-tasks as an eval
 
-Status: **parked**. High impact on *knowing* whether Goal 0 worked, medium effort. Does not raise first-clone odds.
+Status: **done**. Cards in `.nose/example/eval/change-tasks.md`. Executed 2026-09-13 on copies of the example. Recording table filled. L001: W 0.5238→0.5438 (findability), no extra sites, Phase 2 holds. L002: W unchanged 0.5238, no extra sites, Phase 2 holds. Tokens n/a.
 
 Origin: [brainstorming/human-input-a.md](../brainstorming/human-input-a.md).
 

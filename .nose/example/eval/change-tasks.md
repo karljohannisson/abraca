@@ -78,17 +78,19 @@ Ground rules for the executor:
 
 ## Eval recording table
 
-Fill one row per executed task. `tokens` = the agent's spend on the task if
-measurable; otherwise write `n/a`.
+Executed 2026-09-13 on independent copies of `.nose/example/` (not applied to the
+recorded tree). Scorer: `PYTHONPATH=.nose python3 -m maintainability --root <copy>`.
+Tests: `cd <copy> && PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'`.
+`tokens` was not measurable here (`n/a`).
+
+The cards were written when headline W was 0.4286. The recorded tree is now 0.5238
+(volume only) after `python3 -m world` entrypoint tests. Both rows use that measured
+baseline. `w_baseline` in `../product/status.yaml` is still 0.75.
 
 | task | tokens | Phase 2 still holds? | headline W before | headline W after | W rose? | extra sites found | notes |
 |---|---|---|---|---|---|---|---|
-| L001 (add Asia, set_grows) | | | 0.4286 | | | | |
-| L002 (wording change) | | | 0.4286 | | | | |
+| L001 (add Asia, set_grows) | n/a | yes | 0.5238 | 0.5438 | yes | none | Only `regions.py` edited in `src/`. `world Asia` prints Japan/India; Europe unchanged; Atlantis still exit 1. 8 tests OK, scorer exit 0. W rose because `test_region_set_can_grow` ties `world.regions` on tokens `regions`+`grow` and sorts first, so findability F=0→1 (orient +0.02). Volume unchanged. Still under `w_baseline` 0.75. |
+| L002 (wording change) | n/a | yes | 0.5238 | 0.5238 | no | none | Message is `no such region: {name} (try one of: {', '.join(REGIONS)})`. List comes from the authority. 7 tests OK, scorer exit 0, `regions` k=1. Europe unchanged. W did not rise (same statement count in the CLI print). |
 
 "Phase 2 still holds?" = does the finished product still satisfy every FR/TR/DR in
 `../product/phase-2.md` after the change (run the tests; read the diff).
-
-Baseline `w_baseline` in `../product/status.yaml` is 0.75 (a cap set at Phase 4);
-the recorded example's measured headline W is 0.4286. Record the *measured* W in
-the table, and note whether it stayed under `w_baseline`.

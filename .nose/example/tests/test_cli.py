@@ -27,16 +27,17 @@ class CliTest(unittest.TestCase):
     def test_no_args_fails(self) -> None:
         self.assertEqual(main([]), 1)
 
-    def test_module_entrypoint_prints_europe(self) -> None:
+    def test_module_entrypoint_prints_a_known_region(self) -> None:
+        region = next(iter(REGIONS))
         r = subprocess.run(
-            [sys.executable, "-m", "world", "Europe"],
+            [sys.executable, "-m", "world", region],
             cwd=EXAMPLE,
             env={**os.environ, "PYTHONPATH": "src"},
             capture_output=True,
             text=True,
         )
         self.assertEqual(r.returncode, 0, r.stderr)
-        self.assertEqual(r.stdout.splitlines(), ["Germany", "France"])
+        self.assertEqual(r.stdout.splitlines(), REGIONS[region])
 
     def test_module_entrypoint_unknown_region_exits_1(self) -> None:
         r = subprocess.run(

@@ -28,14 +28,14 @@ PYTHONPATH=.nose python3 -m maintainability --root .nose/example
 ```
 
 ```
-W (headline) 0.4286   [0,5] lower=cheaper
-W (floor)    0.4286   scanner only; not proof of zero extras
+W (headline) 0.5238   [0,5] lower=cheaper
+W (floor)    0.5238   scanner only; not proof of zero extras
 ```
 
-Floor equals headline: no extra sites, no confirmed extras. Mass 0.4286 is only
+Floor equals headline: no extra sites, no confirmed extras. Mass 0.5238 is only
 statement volume of a tiny corpus — expected at this size, not a defect. Run the
 tests too: `cd .nose/example && PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py'`
-(5 tests pass).
+(7 tests pass).
 
 A fresh clone does **not** copy this tree; its `product/` starts empty at
 `phase: 1`. This tree exists to imitate, not to seed.

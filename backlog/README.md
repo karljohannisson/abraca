@@ -12,7 +12,7 @@ Goal 0 is still “human talks, agent leads, software matches the need and stays
 | 2 | [hunt-unavoidable.md](hunt-unavoidable.md) | High / low — **done** (CLI fail-closed) |
 | 3 | [plan-lint-checker.md](plan-lint-checker.md) | Medium-high / low — **done** (`.nose/planlint/` lints the example and template bullets) |
 | 4 | [runnable-slice-before-handover.md](runnable-slice-before-handover.md) | High on need-meeting / medium — **done** (orchestrate docs) |
-| 5 | [later-change-task-eval.md](later-change-task-eval.md) | High on knowing, not first-clone odds / medium — **cards shipped** (`.nose/example/eval/`); execution pending |
+| 5 | [later-change-task-eval.md](later-change-task-eval.md) | High on knowing, not first-clone odds / medium — **done** (table in `.nose/example/eval/change-tasks.md`) |
 
 Larger envelope for 2–3 plus process automation: [script-driven-workflow-loop.md](script-driven-workflow-loop.md). Do not build that *and* a second plan linter.
 
