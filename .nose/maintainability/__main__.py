@@ -1,4 +1,4 @@
-"""CLI: PYTHONPATH=.nose python3 -m maintainability [--root DIR] [--json]."""
+"""CLI: PYTHONPATH=.nose python3 -m maintainability [--root DIR] [--json] [--max-w W]."""
 
 from __future__ import annotations
 
@@ -11,19 +11,29 @@ from maintainability import VERSION
 from maintainability.atoms import AtomTotals, score_atoms
 from maintainability.combined import Combined, combined
 from maintainability.corpus import build_corpus
-from maintainability.registry import load_registry
+from maintainability.registry import RegistryError, load_registry
+from maintainability.yaml_lite import load_path
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Maintainability score W (lower is cheaper).")
     parser.add_argument("--root", type=Path, default=Path("."), help="Project root (contains product/)")
     parser.add_argument("--json", action="store_true")
+    parser.add_argument(
+        "--max-w",
+        type=float,
+        default=None,
+        help="Fail with exit 1 if headline W exceeds this. Default: product/status.yaml w_baseline when set.",
+    )
     args = parser.parse_args(argv)
     root = args.root.resolve()
     try:
         registry = load_registry(root)
     except FileNotFoundError as exc:
         print(f"missing product registry: {exc}", file=sys.stderr)
+        return 2
+    except RegistryError as exc:
+        print(f"invalid registry: {exc}", file=sys.stderr)
         return 2
     corpus = build_corpus(root, registry.code_roots, registry.exclude)
     headline = score_atoms(registry, corpus, headline=True)
@@ -34,7 +44,30 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(_as_json(headline, floor, wh, wf), indent=2))
     else:
         print(_as_text(headline, floor, wh, wf))
+    max_w = args.max_w if args.max_w is not None else _status_baseline(root)
+    if max_w is not None and wh.W > max_w:
+        print(f"W {wh.W:.4f} exceeds max {max_w:.4f}", file=sys.stderr)
+        return 1
     return 0
+
+
+def _status_baseline(root: Path) -> float | None:
+    path = root / "product" / "status.yaml"
+    if not path.is_file():
+        return None
+    try:
+        data = load_path(path)
+    except OSError:
+        return None
+    if not isinstance(data, dict):
+        return None
+    raw = data.get("w_baseline")
+    if raw is None:
+        return None
+    try:
+        return float(raw)
+    except (TypeError, ValueError):
+        return None
 
 
 def _as_text(h: AtomTotals, f: AtomTotals, wh: Combined, wf: Combined) -> str:

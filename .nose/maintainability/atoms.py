@@ -2,22 +2,15 @@
 
 from __future__ import annotations
 
-import ast
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from maintainability.complexity import cognitive_complexity
-from maintainability.corpus import Corpus, Mod, statement_count, is_stdlib
+from maintainability import languages as lang
+from maintainability.model import Corpus, Mod
 from maintainability.registry import Axis, Registry
-from maintainability.sites import (
-    STRENGTH_RANK,
-    Site,
-    sites_for_axis,
-    unit_of_site,
-)
+from maintainability.sites import STRENGTH_RANK, Site, sites_for_axis, unit_of_site
 
-T_SIZE = 15
 STOPWORDS = frozenset(
     """
     a an the of to for and or in on at by from with without that this these those
@@ -82,9 +75,9 @@ def score_atoms(registry: Registry, corpus: Corpus, headline: bool) -> AtomTotal
         Z = mean_excess_size(corpus, sites)
         C = mean_complexity(corpus, sites)
         M = mean_mixing(sites, mixing_units, ax.id)
-        H = mean_fanout(corpus, sites, registry)
+        H = mean_fanout(corpus, sites)
         F = findability(ax, corpus)
-        V = checkability(ax, registry, corpus, sites)
+        V = checkability(ax, registry, corpus)
         p = ax.p
         per.append(AxisScore(ax.id, p, k, extras, L, S, Z, C, M, H, F, V))
         D += p * extras
@@ -106,7 +99,6 @@ def locality(registry: Registry, corpus: Corpus, sites: list[Site]) -> int:
     paths = [_containment(registry, corpus, s) for s in sites]
     if all(p == paths[0] for p in paths):
         return 0
-    # same class, different methods
     if (
         all(p[3] is not None and p[:4] == paths[0][:4] for p in paths)
         and len({p[4] for p in paths}) > 1
@@ -143,7 +135,6 @@ def _containment(registry: Registry, corpus: Corpus, site: Site) -> tuple:
     if unit.kind == "function":
         bits = unit.qname.split(".")
         func_name = bits[-1]
-        # class if parent unit is class
         parent = ".".join(bits[:-1])
         if any(u.qname == parent and u.kind == "class" for u in corpus.by_path[site.path].units):
             class_name = bits[-2] if len(bits) >= 2 else None
@@ -156,7 +147,6 @@ def _common_prefix(pkgs: list[tuple]) -> tuple:
     if not pkgs or not all(pkgs):
         return ()
     shortest = min(pkgs, key=len)
-    i = 0
     for i, name in enumerate(shortest):
         if any(p[i] != name if i < len(p) else True for p in pkgs):
             return shortest[:i]
@@ -184,15 +174,14 @@ def mean_excess_size(corpus: Corpus, sites: list[Site]) -> float:
     xs = []
     for s in sites:
         unit = unit_of_site(corpus, s)
-        n = statement_count(unit.node)
-        xs.append(max(n - T_SIZE, 0))
+        xs.append(max(unit.statement_count - unit.working_set, 0))
     return sum(xs) / len(xs)
 
 
 def mean_complexity(corpus: Corpus, sites: list[Site]) -> float:
     if not sites:
         return 0.0
-    xs = [cognitive_complexity(unit_of_site(corpus, s).node) for s in sites]
+    xs = [unit_of_site(corpus, s).complexity for s in sites]
     return sum(xs) / len(xs)
 
 
@@ -203,58 +192,16 @@ def mean_mixing(sites: list[Site], mixing_units: dict[str, set[str]], axis_id: s
     return sum(xs) / len(xs)
 
 
-def mean_fanout(corpus: Corpus, sites: list[Site], registry: Registry) -> float:
+def mean_fanout(corpus: Corpus, sites: list[Site]) -> float:
     if not sites:
         return 0.0
     this_units = {s.unit_qname for s in sites}
-    project_mods = {m.qname: m for m in corpus.modules}
     xs = []
     for s in sites:
         unit = unit_of_site(corpus, s)
-        xs.append(_fanout(unit.node, unit, project_mods, this_units, corpus))
+        refs = {r for r in unit.refs if not any(r == u or r.startswith(u + ".") or u.startswith(r + ".") for u in this_units)}
+        xs.append(len(refs))
     return sum(xs) / len(xs)
-
-
-def _fanout(node: ast.AST, unit, project_mods: dict, this_units: set[str], corpus: Corpus) -> int:
-    local: set[str] = set()
-    for ch in ast.walk(node):
-        if isinstance(ch, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-            if ch is not node:
-                local.add(ch.name)
-        if isinstance(ch, ast.Name) and isinstance(getattr(ch, "ctx", None), ast.Store):
-            local.add(ch.id)
-    imported_project: dict[str, str] = {}
-    for ch in ast.walk(node):
-        if isinstance(ch, ast.ImportFrom) and ch.module:
-            if ch.module.split(".")[0] in {q.split(".")[0] for q in project_mods}:
-                for alias in ch.names:
-                    imported_project[alias.asname or alias.name] = (
-                        f"{ch.module}.{alias.name}" if alias.name != "*" else ch.module
-                    )
-        elif isinstance(ch, ast.Import):
-            for alias in ch.names:
-                if not is_stdlib(alias.name):
-                    imported_project[alias.asname or alias.name.split(".")[0]] = alias.name
-    refs: set[str] = set()
-    for ch in ast.walk(node):
-        if isinstance(ch, ast.Name) and isinstance(ch.ctx, ast.Load):
-            if ch.id in local:
-                continue
-            if ch.id in imported_project:
-                target = imported_project[ch.id]
-                if is_stdlib(target):
-                    continue
-                if any(target == u or u.startswith(target + ".") for u in this_units):
-                    continue
-                if target.split(".")[0] in {q.split(".")[0] for q in project_mods}:
-                    refs.add(target)
-        elif isinstance(ch, ast.Attribute) and isinstance(ch.ctx, ast.Load):
-            if isinstance(ch.value, ast.Name) and ch.value.id in imported_project:
-                target = f"{imported_project[ch.value.id]}.{ch.attr}"
-                if any(target == u or u.startswith(imported_project[ch.value.id]) for u in this_units):
-                    continue
-                refs.add(imported_project[ch.value.id])
-    return len(refs)
 
 
 def findability(axis: Axis, corpus: Corpus) -> int:
@@ -269,11 +216,8 @@ def findability(axis: Axis, corpus: Corpus) -> int:
     if not target:
         return 50
     for i, (_sc, qname) in enumerate(scored, start=1):
-        if qname == target or qname.startswith(target + "."):
-            # prefer exact module match: first exact else first prefix
-            if qname == target:
-                return min(i - 1, 50)
-    # second pass prefix
+        if qname == target:
+            return min(i - 1, 50)
     for i, (_sc, qname) in enumerate(scored, start=1):
         if qname == target or qname.startswith(target + "."):
             return min(i - 1, 50)
@@ -286,7 +230,7 @@ def query_tokens(axis: Axis) -> list[str]:
     return [t for t in raw if t not in STOPWORDS and len(t) > 1]
 
 
-def checkability(axis: Axis, registry: Registry, corpus: Corpus, sites: list[Site]) -> int:
+def checkability(axis: Axis, registry: Registry, corpus: Corpus) -> int:
     auth_path = (registry.root / axis.authority_path).resolve() if axis.authority_path else None
     auth_mod = corpus.by_path.get(auth_path) if auth_path else None
     auth_qname = auth_mod.qname if auth_mod else ""
@@ -297,14 +241,14 @@ def checkability(axis: Axis, registry: Registry, corpus: Corpus, sites: list[Sit
         vmod = corpus.by_path.get(path)
         if vmod is None:
             continue
-        if _module_mentions(vmod, auth_qname):
+        if lang.mentions(vmod, auth_qname):
             imports_mod = True
-        if _reads_authority(vmod, auth_qname):
+        if lang.reads_authority(vmod, auth_qname):
             reads = True
     fail_applies = axis.shape == "new_variant"
     exhaustive = True
     if fail_applies:
-        matches = list(_matches_on_authority(corpus, auth_qname, auth_mod))
+        matches = lang.fail_loud_matches(corpus, auth_qname, auth_mod)
         if not matches:
             fail_applies = False
         else:
@@ -324,111 +268,16 @@ def checkability(axis: Axis, registry: Registry, corpus: Corpus, sites: list[Sit
     return 3
 
 
-def _module_mentions(mod: Mod, auth_qname: str) -> bool:
-    if not auth_qname:
-        return False
-    for node in ast.walk(mod.tree):
-        if isinstance(node, ast.ImportFrom) and node.module:
-            if node.module == auth_qname or node.module.startswith(auth_qname + "."):
-                return True
-            tail = auth_qname.split(".")[-1]
-            if node.module.endswith("." + ".".join(auth_qname.split(".")[:-1]) or "") or any(
-                a.name == tail for a in node.names
-            ):
-                if auth_qname.startswith((node.module or "") + ".") or node.module == ".".join(
-                    auth_qname.split(".")[:-1]
-                ):
-                    return True
-        if isinstance(node, ast.Import):
-            if any(a.name == auth_qname or auth_qname.startswith(a.name + ".") for a in node.names):
-                return True
-    src = mod.source
-    return auth_qname.split(".")[-1] in src and any(
-        auth_qname.split(".")[-1] == a.name
-        for node in ast.walk(mod.tree)
-        if isinstance(node, ast.ImportFrom)
-        for a in node.names
-    )
-
-
-def _reads_authority(mod: Mod, auth_qname: str) -> bool:
-    """Import of authority plus load of imported names (iterate/attr), not mere string recopy."""
-    aliases: set[str] = set()
-    for node in ast.walk(mod.tree):
-        if isinstance(node, ast.ImportFrom) and node.module:
-            if node.module == auth_qname or (
-                node.module == ".".join(auth_qname.split(".")[:-1])
-                and any(a.name == auth_qname.split(".")[-1] for a in node.names)
-            ):
-                for a in node.names:
-                    aliases.add(a.asname or a.name)
-        if isinstance(node, ast.Import):
-            for a in node.names:
-                if a.name == auth_qname:
-                    aliases.add(a.asname or a.name.split(".")[-1])
-    if not aliases:
-        return False
-    for node in ast.walk(mod.tree):
-        if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load) and node.id in aliases:
-            return True
-        if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
-            if node.value.id in aliases:
-                return True
-        if isinstance(node, ast.For) and isinstance(node.iter, ast.Name) and node.iter.id in aliases:
-            return True
-    return False
-
-
-def _matches_on_authority(corpus: Corpus, auth_qname: str, auth_mod: Mod | None):
-    variant_names: set[str] = set()
-    if auth_mod:
-        for u in auth_mod.units:
-            if u.kind == "class" and u.qname != auth_qname:
-                variant_names.add(u.qname.split(".")[-1])
-        for node in ast.walk(auth_mod.tree):
-            if isinstance(node, ast.Assign):
-                for t in node.targets:
-                    if isinstance(t, ast.Name) and t.id.isupper():
-                        variant_names.add(t.id)
-    for mod in corpus.modules:
-        for node in ast.walk(mod.tree):
-            if isinstance(node, ast.Match):
-                cases = node.cases
-                has_wild = any(
-                    isinstance(c.pattern, ast.MatchAs) and c.pattern.pattern is None and c.pattern.name is None
-                    for c in cases
-                )
-                # also MatchAs with name _ 
-                has_wild = has_wild or any(
-                    isinstance(c.pattern, ast.MatchAs) and (c.pattern.name in {None, "_"} and c.pattern.pattern is None)
-                    for c in cases
-                )
-                mentioned = False
-                for c in cases:
-                    for n in ast.walk(c.pattern):
-                        if isinstance(n, ast.Name) and (n.id in variant_names or n.id == auth_qname.split(".")[-1]):
-                            mentioned = True
-                        if isinstance(n, ast.MatchClass) and n.cls:
-                            pass
-                if mentioned or _match_subject_is_auth(node, auth_qname.split(".")[-1]):
-                    yield (not has_wild, mod.path)
-
-
-def _match_subject_is_auth(node: ast.Match, tail: str) -> bool:
-    sub = node.subject
-    if isinstance(sub, ast.Name) and sub.id.lower() == tail.lower():
-        return True
-    return True  # conservative: if we yielded from mentioned variants
-
-
 def volume(registry: Registry, corpus: Corpus, headline: bool) -> float:
-    total = 0
-    reachable_paths: set[Path] = set()
     roots: list[Path] = []
     for ep in registry.entry_points:
+        if not isinstance(ep, dict):
+            continue
         p = ep.get("path")
         if p:
             roots.append((registry.root / p).resolve())
+    if not any(isinstance(ep, dict) and ep.get("path") for ep in registry.entry_points):
+        roots.extend(lang.default_entry_paths(registry.root))
     for ax in registry.live_axes():
         roots.append((registry.root / ax.authority_path).resolve())
         for v in ax.verifies:
@@ -436,6 +285,7 @@ def volume(registry: Registry, corpus: Corpus, headline: bool) -> float:
     qname_to_mod = {m.qname: m for m in corpus.modules}
     work = [p for p in roots if p in corpus.by_path]
     seen: set[Path] = set()
+    reachable_paths: set[Path] = set()
     while work:
         path = work.pop()
         if path in seen:
@@ -443,32 +293,28 @@ def volume(registry: Registry, corpus: Corpus, headline: bool) -> float:
         seen.add(path)
         reachable_paths.add(path)
         mod = corpus.by_path[path]
-        for node in ast.walk(mod.tree):
-            targets: list[str] = []
-            if isinstance(node, ast.ImportFrom):
-                from maintainability.sites import _abs_import
-
-                base = _abs_import(mod.qname, node)
-                if base:
-                    targets.append(base)
-                    for a in node.names:
-                        targets.append(f"{base}.{a.name}")
-            elif isinstance(node, ast.Import):
-                targets.extend(a.name for a in node.names)
-            for t in targets:
-                if t in qname_to_mod:
-                    work.append(qname_to_mod[t].path)
-                parent = ".".join(t.split(".")[:-1])
-                if parent in qname_to_mod:
-                    work.append(qname_to_mod[parent].path)
+        for t in mod.import_edges:
+            if t in qname_to_mod:
+                work.append(qname_to_mod[t].path)
+            parent = ".".join(t.split(".")[:-1])
+            if parent in qname_to_mod:
+                work.append(qname_to_mod[parent].path)
     if headline:
         reachable_paths.update(registry.confirmed_live)
     reached_stmts = 0
+    total = 0
     for mod in corpus.modules:
-        n = statement_count(mod.tree)
+        n = _module_statement_count(mod)
         total += n
         if mod.path in reachable_paths:
             reached_stmts += n
     if total == 0:
         return 0.0
     return (total - reached_stmts) / total
+
+
+def _module_statement_count(mod: Mod) -> int:
+    unit = next((u for u in mod.units if u.kind == "module"), None)
+    if unit is None:
+        return 0
+    return unit.statement_count

@@ -1,3 +1,3 @@
-"""Python maintainability metric (goal 4). Definition: .nose/docs/metric.md."""
+"""Maintainability metric W. Definition: .nose/docs/metric.md. Python backend: languages/python.py."""
 
 VERSION = 1
