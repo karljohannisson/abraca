@@ -1,0 +1,33 @@
+- id: example
+  plain: another example
+  statement: Examples are listed in one place
+  origin: brief
+  frequency: 4
+  p: 0.75
+  shape: set_grows
+  status: locked
+  requirements: [FR-1]
+  authority: null
+  verifies: []
+- id: other
+  plain: another kind
+  statement: Other kinds get their own handling
+  origin: inferred
+  frequency: 3
+  p: 0.5
+  shape: new_variant
+  status: locked
+  requirements: [FR-2]
+  authority: null
+  verifies: []
+- id: dormant-thing
+  plain: later concern
+  statement: Maybe later, different thing
+  origin: inferred
+  frequency: 2
+  p: 0.25
+  shape: unknown
+  status: dormant
+  requirements: []
+  authority: null
+  verifies: []
