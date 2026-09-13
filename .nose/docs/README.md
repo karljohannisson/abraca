@@ -1,32 +1,30 @@
 # Maintainability seed — start here
 
-You are a coding agent. This tree is **how to work**. The rest of the repo is **the product**.
+You are a coding agent. The human cloned this repo (or copied `.nose/` + root `AGENTS.md`) and will **talk until the product exists**. They do not drive phases, name files, or know the metric.
 
-Hand this seed (the parent `.nose/` directory, plus a root `AGENTS.md`) to an agent together with a human who knows the product. The human does **not** need software experience. They know what the software is for and what might change in their world. You infer the rest.
+You orchestrate five phases. Context is treated as **reset between phases** (and between Phase 4 tasks). Only the artifacts listed for the next phase travel forward.
 
-## Load order
+## Load
 
 1. This file.
-2. If `product/` is missing, empty, or disagrees with the human’s last message: [workflow/bootstrap.md](workflow/bootstrap.md), then [workflow/planning.md](workflow/planning.md). **Do not write product code** until the human has accepted a recap in ordinary language and you have written `product/`.
-3. Always: [workflow/agent.md](workflow/agent.md).
-4. Human (so you know how to talk to them): [workflow/human.md](workflow/human.md).
-5. After planning: [workflow/handoff.md](workflow/handoff.md) → [workflow/implementing.md](workflow/implementing.md) → [workflow/review.md](workflow/review.md).
+2. [workflow/orchestrate.md](workflow/orchestrate.md) — how you coordinate, when a phase is done, how to reset.
+3. `product/status.yaml` or start Phase 1.
+4. Current phase instruction + listed artifacts only.
+5. How to talk: [workflow/human.md](workflow/human.md).
 
-Principles (do not copy formulas into the workflow): [principles/README.md](principles/README.md). Combined score \(W\): [metric.md](metric.md). Schema of `product/`: [workflow/artifacts.md](workflow/artifacts.md).
+Phases: [workflow/README.md](workflow/README.md). Schema: [workflow/artifacts.md](workflow/artifacts.md). Principles: [principles/README.md](principles/README.md). Score \(W\): [metric.md](metric.md).
 
-## Three layers
+## Layers
 
 | Layer | Where | Who writes it |
 |---|---|---|
-| Seed | `.nose/` (this docs tree, the metric package, metric tests) and root `AGENTS.md` | Copied. Do not fork per product. |
-| Intent | `product/` at the **product root** | **You.** The human talks; you write every file. |
-| Code | `src/`, `tests/` at the product root | You, after the handoff. |
-
-`.nose/` is a dot directory — open it even if a listing hides it.
+| Seed | `.nose/` + root `AGENTS.md` | Copied. Do not fork per product. |
+| Intent | `product/` | **You.** Human talks; you write every file. |
+| Code | `src/`, `tests/` | You, Phase 4 tasks only. |
 
 ## Non-negotiable
 
-- The human **talks**. They do not edit yaml, name modules, or confirm extra sites.
-- You **infer** independent change reasons the brief never named (a non-software person will not say “API protocols”). Propose them as bets, in domain language, with a because. Wait for yes / no / later. Do not build a framework because “this often changes.”
-- Agreement that lives only in chat is not locked. Planning is unfinished until `product/` matches what the human accepted.
-- Score after a slice: from the product root, `PYTHONPATH=.nose python3 -m maintainability`. Lower \(W\) is cheaper. The human does not interpret atoms; you hunt extras and **delete** them.
+- The human talks. You infer, explain terms the first time, confirm bets. You never ask them to run the process.
+- Chat is not the lock. A phase is unfinished until its artifact on disk matches what they accepted.
+- Do not write product code before Phase 4, and then only inside a task that passed the **plan lint**.
+- After every Phase 4 task: hunt extra encodings and **delete** them; run `PYTHONPATH=.nose python3 -m maintainability`; headline \(W\) must not rise (or log why).

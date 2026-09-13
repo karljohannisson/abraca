@@ -1,21 +1,19 @@
 # `.nose/` — maintainability seed
 
-This directory is the **workflow seed**, not the product. Copy it (plus the root `AGENTS.md`) into a repo; the rest of that repo is the software you are building.
+Clone the repo (or copy this directory plus root `AGENTS.md`). Point an agent at the repo and **talk**. The agent runs five phases until the product exists. You do not drive the workflow.
 
-A non-software human talks. The agent infers unnamed change axes, writes `product/`, and implements. Start: [docs/README.md](docs/README.md).
+Start: [docs/README.md](docs/README.md). Orchestration: [docs/workflow/orchestrate.md](docs/workflow/orchestrate.md).
 
 | Here | Product (repo root) |
 |---|---|
-| `docs/principles/` — ten atoms | `product/` — requirements and change axes (**agent-written**) |
-| `docs/workflow/` — human talks; agent plans/implements | `src/<name>/` — authorities |
+| `docs/principles/` — ten atoms | `product/` — phase artifacts (**agent-written**) |
+| `docs/workflow/` — phases 1–5 | `src/<name>/` — authorities (Phase 4) |
 | `docs/metric.md` — combined \(W\) | `tests/` — product `verifies` |
 | `maintainability/` — `python -m maintainability` | |
 | `tests/` — tests for that metric | |
 
-From the **product root** (this repo’s root):
+From the **product root**:
 
 ```
 PYTHONPATH=.nose python3 -m maintainability
 ```
-
-`--root` defaults to the working directory, which must contain `product/`.

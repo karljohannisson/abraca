@@ -1,74 +1,58 @@
-# Product intent files
+# Product files
 
-Per-repo planning surface. The **agent writes every file**. The human talks ([human.md](human.md)). Not a requirements-to-code matrix. No `uses` links.
+You write every file. The human talks. Not a requirements-to-code matrix. No `uses` links between code modules.
 
-| File | Holds | Source of truth for |
+| File | Phase | Role |
 |---|---|---|
-| `product/requirements.md` | Product brief, frozen decisions, **current slice** (language the human accepted) | What to build now; what must not be designed for |
-| `product/axes.yaml` | Live and dormant change axes | \(r\), \(P\), shape, authority, `verifies`, origin |
-| `product/entry-points.yaml` | Program starts and public API; optional `code_roots`, `exclude`, `confirmed_live`, `deployables` | Accidental-volume roots; which trees the metric parses |
-| `product/probes.md` | Open questions that would split, merge, or set shape/likelihood | Unresolved planning only |
+| `product/status.yaml` | all | Where a cold agent starts; listed artifacts |
+| `product/phase-1.md` | 1 | Invariant core, what this is not, notes for 2, parked |
+| `product/phase-2.md` | 2 | Atomic MECE v1 requirements + pictures |
+| `product/axes.yaml` | 3 | Change axes (the registry \(W\) reads) |
+| `product/phase-4-plan.md` | 4 | MECE task DAG, linted against axes (orchestrator only) |
+| `product/current-task.md` | 4 | The one task the current task agent may see |
+| `product/decisions.md` | 4–5 | Judgment calls every later task reads |
+| `product/entry-points.yaml` | 4 | Program starts / public API; metric roots |
+| `product/phase-5.md` | 5 | Handover in the human’s language |
 
-`.nose/docs/principles/` is not product intent. It is part of the seed.
+`.nose/docs/principles/` is seed, not product intent.
 
-## Field ownership (`axes.yaml`)
+Templates: [templates/](templates/).
 
-| Field | Who authors | Who confirms |
+## `axes.yaml` fields
+
+| Field | Who | Notes |
 |---|---|---|
-| `id`, `statement`, `plain`, `because`, `origin`, `p`, `shape`, `status` | Agent (from talk + inference) | Human confirms the **plain recap**, not the yaml |
-| `authority.symbol`, `authority.path` | Agent | Nobody, unless two encodings compete and a software person is present |
-| `verifies` | Agent writes tests and lists them | — |
-| `extra_sites` | Agent hunts | **Not the human.** Delete the extra, or stop. `status: confirmed` is only if a software collaborator exists; see [metric.md](../metric.md) |
+| `id`, `plain`, `statement`, `because`, `origin`, `frequency`, `p`, `shape`, `status`, `requirements` | Phase 3 agent; human confirms the **plain recap** | `p` from frequency table in [phase-3-axes.md](phase-3-axes.md) |
+| `authority.symbol`, `authority.path` | Phase 4 **authority task** | null after Phase 3 |
+| `verifies` | Phase 4 task that adds the test | paths |
+| `extra_sites` | Task agent hunt | Prefer **delete**. Not a human form. `confirmed` only if a software collaborator keeps an extra |
 
-`origin`: `brief` (they described it) · `human` (they said “this should be an axis because …”) · `inferred` (you proposed it).
+`origin`: `brief` · `human` · `inferred`.
 
-`because`: one line. For `inferred`, the bet. For `human`, their xyz. For `brief`, the clustering why.
+`status`: `locked` (design for it) · `dormant` (no code until shape is known). No `proposed` after Phase 3 recap.
 
-`plain`: one sentence they would recognize. Used in recaps. `statement` is the design sentence (findability tokens).
+`p`: numeric in \([0,1]\) (from frequency) or `high` / `medium` / `low` (1.0 / 0.5 / 0.25). Scorer accepts both. `frequency` is ignored by the scorer, as are `plain`, `because`, `origin`, `requirements`.
 
-`status`: `proposed` (drafted, not agreed) · `locked` (design for it) · `dormant` (declared, do **not** implement until shape is known). After an accepted recap, no `proposed` rows remain.
+`shape` ([principle 9](../principles/09-checkability.md)):
 
-`p`: `high` · `medium` · `low` from expect / maybe / basically never. Omit \(P \approx 0\) and unexpectable reasons; those are **Frozen** in `requirements.md`, not rows.
+| Value | Domain cue |
+|---|---|
+| `set_grows` | another of the same kind |
+| `new_variant` | different kind that needs its own handling |
+| `signature_rename` | rename or change fields |
+| `formula_value` | wording, layout, or the number we show |
+| `unknown` | only with `dormant` |
 
-`shape` (must match [principle 9](../principles/09-checkability.md)):
+Exactly one authority per locked row, filled in Phase 4. Members live in code, not yaml.
 
-| Value | Meaning | Domain cue |
-|---|---|---|
-| `set_grows` | Members added; uses should pick them up. Fail-loud does not apply. | “another one of the same kind” |
-| `new_variant` | New arm needs handling. Exhaustive match / typed visitor. | “a different kind that needs its own handling” |
-| `signature_rename` | Name/arity/field change. Types should break uses. | “we might rename or change the fields” |
-| `formula_value` | Presentation, formula, stored value. Verifies read the authority. | “wording, layout, or the number we show” |
-| `unknown` | Only with `status: dormant`. | “we don’t know what it looks like yet” |
+`entry-points.yaml`: `code_roots`, `exclude` (always exclude `.nose`), `entry_points`, optional `confirmed_live`, `deployables`. Run from product root: `PYTHONPATH=.nose python3 -m maintainability`.
 
-Exactly one `authority` per locked row. Do not hand-maintain member lists in yaml; members live in the authority in code.
-
-`extra_sites` (optional, on a locked row) — agent-owned hunt, not a human form:
-
-```yaml
-extra_sites:
-  - path: src/foo.py          # file containing a confirmed extra encoding
-    status: confirmed         # proposed | confirmed
-    strength: meaning         # name | meaning | position | algorithm | dynamic
-```
-
-Token-scan Name extras are detected in code and need not be listed. List Meaning and stronger only when a software collaborator confirmed them **and** you are not deleting them this slice. Prefer delete.
-
-`entry-points.yaml` optional keys: `code_roots` (path prefixes to parse), `exclude` (subtract), `confirmed_live` (static-dead but actually live — ask in domain language: “do you still use this?”), `deployables` (prefixes; default one deployable). Combined score: [metric.md](../metric.md). Run from the product root: `PYTHONPATH=.nose python3 -m maintainability`.
-
-## Generated repo layout
+## Layout after a clone
 
 ```
-AGENTS.md                 # thin; points at .nose/
-.nose/                    # seed (copy this)
-  README.md
-  docs/                   # start: docs/README.md
-  maintainability/        # python -m maintainability
-  tests/                  # tests for the metric, not the product
-product/                  # THIS software (agent-written)
-  requirements.md
-  axes.yaml
-  entry-points.yaml
-  probes.md
-src/<name>/               # authorities
-tests/                    # product verifies
+AGENTS.md                 # orchestrator entry
+.nose/                    # seed
+product/                  # you create; status.yaml first
+src/<name>/               # Phase 4
+tests/                    # Phase 4 verifies
 ```

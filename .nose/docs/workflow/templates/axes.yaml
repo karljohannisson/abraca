@@ -1,0 +1,15 @@
+# Filled in Phase 3. authority filled in Phase 4 authority tasks.
+version: 1
+axes:
+  - id: example
+    plain: One sentence the human would recognize.
+    statement: Design sentence; findability tokens live here.
+    because: Why this is not another row.
+    origin: inferred
+    frequency: 4
+    p: 0.75
+    shape: set_grows
+    status: locked
+    requirements: [FR-1]
+    authority: null
+    verifies: []

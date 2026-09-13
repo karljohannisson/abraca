@@ -9,10 +9,10 @@
    - Mass: [10 accidental volume](principles/10-accidental-volume.md)
 2. Turn the findings into a package of tiered instructions for coding agents and humans.
 
-   Seed a non-software human can drive: they talk ([workflow/human.md](workflow/human.md)); the agent infers unnamed axes, writes `product/`, and implements. Entry: [README.md](README.md). Bootstrap: [workflow/bootstrap.md](workflow/bootstrap.md). Planning must finish at [workflow/handoff.md](workflow/handoff.md). Worked example: this repo’s chat app (`protocols` was inferred).
+   Five phases the **agent drives**; the human only talks. Clone, open `AGENTS.md`, talk until handover. Coordination: [workflow/orchestrate.md](workflow/orchestrate.md). Phases: [workflow/README.md](workflow/README.md). Context resets between phases and between Phase 4 tasks; only listed artifacts travel. Phase 4 plan is linted against axes **before code**; each task is gated on \(W\).
 3. Define a metric that quantifies these findings and can be applied on any python code base. Lower score means cheaper to maintain.
 
-   Defined: [metric.md](metric.md). Combined \(W \in [0,5]\) from the ten atoms. Lower is cheaper. **Claimable without a software reviewer:** floor is not proof of \(k=1\); the agent hunts and deletes extras; \(W\) is the backstop ([metric.md](metric.md) “What \(W\) can claim”).
+   Defined: [metric.md](metric.md). Combined \(W \in [0,5]\) from the ten atoms. Lower is cheaper. Phase 4 tasks cannot claim done without the \(W\) gate. Floor is not proof of \(k=1\); the agent hunts and deletes extras.
 4. Implement that metric.
 
-   CLI: `PYTHONPATH=.nose python3 -m maintainability` (`.nose/maintainability/`). Stdlib only. Setup is the product’s `product/`.
+   CLI: `PYTHONPATH=.nose python3 -m maintainability` (`.nose/maintainability/`). Stdlib only. Setup is `product/axes.yaml` + `product/entry-points.yaml`.

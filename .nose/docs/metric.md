@@ -23,7 +23,7 @@ Without a registry, atoms 1–9 are undefined. Accidental volume can still run f
 | medium | \(0.5\) |
 | low | \(0.25\) |
 
-Numeric \(P \in [0,1]\) in yaml is allowed and used as-is. Dormant and proposed rows are omitted from every sum. Frozen reasons are not rows.
+Numeric \(P \in [0,1]\) in yaml is allowed and used as-is. Phase 3 stores human frequency 1–5 and writes `p` from that table ([workflow/phase-3-axes.md](workflow/phase-3-axes.md)). Dormant and proposed rows are omitted from every sum. Frozen reasons are not rows.
 
 ## Atoms (unchanged)
 
@@ -110,18 +110,20 @@ Equal group weight so Load’s four atoms do not outvote Orient’s one.
 - Cognitive complexity: Sonar/Campbell on that unit (see implementation).
 - Findability query: identifier-style tokens from `statement` and `id`, stopwords dropped; do not add the authority path.
 - Live authorities are reachability roots. `verifies` tests are not unreachable. `confirmed_live` paths are not unreachable.
-- `origin`, `plain`, `because` on an axis are ignored. They are planning fields ([workflow/artifacts.md](workflow/artifacts.md)).
+- `origin`, `plain`, `because`, `frequency`, `requirements` on an axis are ignored. They are Phase 3 fields ([workflow/artifacts.md](workflow/artifacts.md)).
 
 ## What \(W\) can claim without a software human
 
-Goal 3 is the backstop for [workflow/review.md](workflow/review.md) when the driver is a non-software person.
+Goal 3 is the backstop for [workflow/phase-4-task.md](workflow/phase-4-task.md) and [workflow/phase-5-handover.md](workflow/phase-5-handover.md). The human does not drive phases or classify sites.
+
+A Phase 4 **plan** is not scored. Lint it against `axes.yaml` ([workflow/phase-4-plan.md](workflow/phase-4-plan.md)) before any task. Architecture is one authority per locked axis — not class diagrams that skip the registry.
 
 - The registry may be **entirely agent-authored**. Scoring does not care who typed the yaml.
 - **Floor** is automatic (authority + token-scan Name extras). The agent must not claim \(k=1\) or “no extras” from the floor.
 - **Headline** extras of Meaning+ need a hunt. The human is **not** a site classifier. Treat hunt hits as **defects to delete**, not as yaml for the human to confirm. `extra_sites` with `status: confirmed` is only for a software collaborator who is keeping an extra this slice.
 - `confirmed_live` is the one metric field that may need a **product** question (“do you still use the extra-commands plugin?”), never a metrics question.
 - Translate \(W\) for the human in one sentence if it moved. Do not ask them to interpret atoms, caps, or groups.
-- A slice is **claimable** without a software reviewer when verifies pass, hunt hits are gone, dormant/frozen code is absent, and headline \(W\) did not rise (or the rise is explained in domain language). That is how 3 makes 2 trustable without someone looking at sites.
+- A Phase 4 **task** (and then handover) is **claimable** without a software reviewer when verifies pass, hunt hits are gone, dormant/frozen code is absent, and headline \(W\) did not rise (or the rise is logged against a Phase 2 id). That is how 3 makes the agent-only implement phase trustable without someone looking at sites.
 
 ## Not \(W\)
 
