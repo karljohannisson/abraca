@@ -13,7 +13,7 @@ How the language-neutral atoms in [principles/](../principles/README.md) and [me
 | Size \(T\) | 15 `ast.stmt` in the enclosing unit. Nested `def`/`class` are other units. |
 | Complexity | Sonar/Campbell on that unit. A `class` body scores 0. |
 | Coupling | Direct same-repo names after resolving imports. Stdlib and third-party do not count. |
-| Checkability fail-loud | `shape: new_variant` only. Exhaustive `match` whose subject is the authority. No `_` wildcard. |
+| Checkability fail-loud | `shape: new_variant` only. Exhaustive `match` whose subject is the authority. No `_` wildcard. `shape: signature_rename` has no fail-loud: the backend cannot observe type/attribute errors, so a verifies test that reads the authority scores \(V=1\), never \(V=0\) (unlike `set_grows`, where reading alone gives \(V=0\)). |
 | Volume | Module-import closure. A live import marks every statement in that file reached. Nested dead functions in a live file do not add mass. |
 | Findability | Identifier tokens from `statement` and axis `id` vs qualified names and first docstring lines. |
 
@@ -27,7 +27,7 @@ The authority site is the **module** of `authority.path`, not the enclosing func
 
 ## Not implemented
 
-`shape: signature_rename` fail-loud (type or attribute errors). Tracked in [bugs/signature-rename-fail-loud.md](../../../bugs/signature-rename-fail-loud.md).
+`shape: signature_rename` fail-loud (type or attribute errors). The scorer reflects this honestly: a verifies test that reads the authority gives \(V=1\), not \(V=0\) — the fail-loud half of the shape is unmeasured. Tracked in [bugs/signature-rename-fail-loud.md](../../../bugs/signature-rename-fail-loud.md).
 
 ## CLI
 

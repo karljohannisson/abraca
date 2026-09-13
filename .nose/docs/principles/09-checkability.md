@@ -29,8 +29,8 @@ Lower is cheaper.
 
 | \(V\) | After editing the authority for this \(r\) |
 |---|---|
-| 0 | At least one **`verifies`** test **reads** the authority (iterates, parametrizes, imports members — does not recopy). And if the change shape requires per-variant handling, every project `match`/`if-elif` on that type is exhaustive (no `_` / `else` default). |
-| 1 | One of those two is missing: authority-driven verifies without fail-loud (where fail-loud applies), or fail-loud without authority-driven verifies. |
+| 0 | Fail-loud does not apply to the shape (set grows, formula/value), and a **`verifies`** test **reads** the authority (iterates, parametrizes, imports members — does not recopy). Or, for shapes where fail-loud applies and is implemented: reads the authority **and** the fail-loud check is exhaustive (no `_` / `else` default on every project `match`/`if-elif` on that type). |
+| 1 | Authority-driven verifies exist but the fail-loud half is missing **or unmeasured**: reads without exhaustive fail-loud (where fail-loud applies and is implemented), exhaustive fail-loud without authority-driven verifies, or — for `signature_rename` — reads without any implemented fail-loud (a reading verifies can never certify 0 there; see below). |
 | 2 | Some test imports the authority’s module, but it neither reads the authority nor fail-louds the shape (recopy, incidental import, coverage without binding). |
 | 3 | No automated test references the authority’s module, and fail-loud does not apply or is absent. |
 
@@ -40,7 +40,7 @@ Change shape (from the registry) decides whether fail-loud applies:
 |---|---|
 | Set grows; uses should pick up members automatically | Fail-loud **does not apply**. \(V=0\) if verifies *read* the authority. Iteration is the correct use. |
 | New variant needs handling | Exhaustive match / typed visitor without default. Python implements exhaustive `match` on the authority subject. |
-| Signature / field rename | Type-checker or attribute errors at uses. **Not implemented.** [bugs/signature-rename-fail-loud.md](../../../bugs/signature-rename-fail-loud.md). |
+| Signature / field rename | Type-checker or attribute errors at uses. **Not implemented** for Python: the backend cannot observe this fail-loud, so a verifies test that reads the authority scores \(V=1\), never \(V=0\). [bugs/signature-rename-fail-loud.md](../../../bugs/signature-rename-fail-loud.md). |
 | Formula / value | No structural fail-loud; verifies that read inputs/authority and assert outputs. |
 
 ## How \(V\) is obtained

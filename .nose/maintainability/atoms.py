@@ -261,6 +261,19 @@ def checkability(axis: Axis, registry: Registry, corpus: Corpus) -> int:
         if imports_mod:
             return 2
         return 3
+    # shape == "signature_rename": fail-loud (type/attribute errors at uses)
+    # is NOT implemented (bugs/signature-rename-fail-loud.md), so a verifies
+    # test that reads the authority cannot certify V=0 — the shape's
+    # fail-loud half is unmeasured. Score it as V=1 (authority-driven
+    # verifies without fail-loud), which stays honest and stays below
+    # plain module-import (V=2), and is distinguishable from set_grows,
+    # where iteration IS the correct use and reads alone give V=0.
+    if axis.shape == "signature_rename":
+        if reads:
+            return 1
+        if imports_mod:
+            return 2
+        return 3
     if reads:
         return 0
     if imports_mod:
