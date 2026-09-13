@@ -1,6 +1,6 @@
 # A finished tiny run the next agent can copy
 
-Status: **partial**. Loop recorded under `.nose/example/` (2026-09-13). Open: [bugs/example-cli-never-calls-main.md](../bugs/example-cli-never-calls-main.md).
+Status: **done**. Loop recorded under `.nose/example/` (2026-09-13). CLI entrypoint fixed: [bugs/example-cli-never-calls-main.md](../bugs/example-cli-never-calls-main.md).
 
 **Why.** A clone has no Phase 5 example. Agents invent the workflow each time. A todo-sized product, or a transcript of phases 1–5 plus the `src/` that came out of it, is what they imitate.
 

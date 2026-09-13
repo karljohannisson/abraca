@@ -1,6 +1,6 @@
 # Planlint rejects real `product/axes.yaml`
 
-**Status:** open.
+**Status:** fixed.
 
 **Where.** `.nose/planlint/__init__.py` `main()`.
 

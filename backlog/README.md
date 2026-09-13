@@ -8,9 +8,9 @@ Goal 0 is still “human talks, agent leads, software matches the need and stays
 
 | # | Item | Impact / effort |
 |---|---|---|
-| 1 | [finished-tiny-run.md](finished-tiny-run.md) | High / medium — **partial** (loop recorded; CLI no-op, see [bugs/example-cli-never-calls-main.md](../bugs/example-cli-never-calls-main.md)) |
+| 1 | [finished-tiny-run.md](finished-tiny-run.md) | High / medium — **done** (`.nose/example/`; `python3 -m world` runs) |
 | 2 | [hunt-unavoidable.md](hunt-unavoidable.md) | High / low — **done** (CLI fail-closed) |
-| 3 | [plan-lint-checker.md](plan-lint-checker.md) | Medium-high / low — **partial** (checker exists; cannot lint real plans, see [bugs/planlint-axes-must-be-a-list.md](../bugs/planlint-axes-must-be-a-list.md) and [bugs/planlint-ignores-template-encodes.md](../bugs/planlint-ignores-template-encodes.md)) |
+| 3 | [plan-lint-checker.md](plan-lint-checker.md) | Medium-high / low — **done** (`.nose/planlint/` lints the example and template bullets) |
 | 4 | [runnable-slice-before-handover.md](runnable-slice-before-handover.md) | High on need-meeting / medium — **done** (orchestrate docs) |
 | 5 | [later-change-task-eval.md](later-change-task-eval.md) | High on knowing, not first-clone odds / medium — **cards shipped** (`.nose/example/eval/`); execution pending |
 

@@ -1,6 +1,6 @@
 # Example `python3 -m world` never calls `main`
 
-**Status:** open.
+**Status:** fixed.
 
 **Where.** `.nose/example/src/world/__main__.py`.
 

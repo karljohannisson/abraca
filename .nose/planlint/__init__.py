@@ -7,19 +7,10 @@ Validates `product/phase-4-plan.md` against `product/axes.yaml`:
 - No task encodes a dormant axis (frozen reasons are never rows, so any
   unknown id is also a failure).
 
-Plan convention (minimal): each task is a `## Tnnn — …` heading that contains
-one fenced YAML block with a `task` info string:
-
-    ## T001 — example authority
-
-    ```yaml task
-    encodes: [example]
-    uses: []
-    ```
-
-Anything before the first task heading, and any fenced block that is not
-`yaml task`, is ignored. Run: `PYTHONPATH=.nose python3 -m planlint`.
-Exit 0 on pass, 1 on any failure.
+Plan convention: each task is a `## Tnnn` heading. `encodes` is read from a
+markdown bullet (`- encodes: [id]`) as in the phase-4 plan template, or from
+a fenced `yaml task` block if one is present. Run:
+`PYTHONPATH=.nose python3 -m planlint`. Exit 0 on pass, 1 on any failure.
 """
 
 from __future__ import annotations
@@ -35,7 +26,7 @@ DEFAULT_AXES = Path("product/axes.yaml")
 
 _TASK_HEADING = re.compile(r"^##\s+(T\d+)\b")
 _FENCE = re.compile(r"^```(.*)$")
-_LIST = re.compile(r"\[[^\]]*\]")
+_ENCODE_LINE = re.compile(r"^(?:-\s*)?encodes:\s*(.*)$")
 
 
 def lint(plan_text: str, axes) -> list[str]:
@@ -45,10 +36,8 @@ def lint(plan_text: str, axes) -> list[str]:
     known = {r["id"] for r in axes} | dormant
 
     encodes: dict[str, list[str]] = {}
-    for tid, block in _task_blocks(plan_text):
-        data = yaml_load(block)
-        ids = _ids(data.get("encodes") if isinstance(data, dict) else None)
-        encodes[tid] = ids
+    for tid, section in _task_sections(plan_text):
+        encodes[tid] = _encodes_in_section(section)
 
     errors: list[str] = []
     for tid, ids in encodes.items():
@@ -71,8 +60,7 @@ def lint(plan_text: str, axes) -> list[str]:
     return errors
 
 
-def _task_blocks(text: str):
-    """Yield (task_id, yaml_block) for each `## Tnnn` heading with a ```yaml task fence."""
+def _task_sections(text: str):
     lines = text.splitlines()
     i = 0
     while i < len(lines):
@@ -82,21 +70,48 @@ def _task_blocks(text: str):
             continue
         tid = m.group(1)
         i += 1
-        block: list[str] | None = None
-        while i < len(lines):
-            fence = _FENCE.match(lines[i].strip())
-            if fence and (fence.group(1) or "").split()[0:1] == ["yaml"] and "task" in fence.group(1):
-                block = []
-                i += 1
-                while i < len(lines) and lines[i].strip() != "```":
-                    block.append(lines[i])
-                    i += 1
-                break
-            if _TASK_HEADING.match(lines[i]) or lines[i].startswith("# "):
-                break
+        start = i
+        while i < len(lines) and not _TASK_HEADING.match(lines[i]) and not lines[i].startswith("# "):
             i += 1
-        if block is not None:
-            yield tid, "\n".join(block)
+        yield tid, "\n".join(lines[start:i])
+
+
+def _encodes_in_section(section: str) -> list[str]:
+    fence = _yaml_task_block(section)
+    if fence is not None:
+        data = yaml_load(fence)
+        return _ids(data.get("encodes") if isinstance(data, dict) else None)
+    for line in section.splitlines():
+        m = _ENCODE_LINE.match(line.strip())
+        if m:
+            return _ids(m.group(1).strip() or None)
+    return []
+
+
+def _yaml_task_block(section: str) -> str | None:
+    lines = section.splitlines()
+    i = 0
+    while i < len(lines):
+        fence = _FENCE.match(lines[i].strip())
+        if fence and (fence.group(1) or "").split()[0:1] == ["yaml"] and "task" in fence.group(1):
+            block: list[str] = []
+            i += 1
+            while i < len(lines) and lines[i].strip() != "```":
+                block.append(lines[i])
+                i += 1
+            return "\n".join(block)
+        i += 1
+    return None
+
+
+def _axis_rows(raw) -> list | None:
+    if isinstance(raw, list):
+        return [r for r in raw if isinstance(r, dict)]
+    if isinstance(raw, dict):
+        rows = raw.get("axes")
+        if isinstance(rows, list):
+            return [r for r in rows if isinstance(r, dict)]
+    return None
 
 
 def _ids(value) -> list[str]:
@@ -135,9 +150,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"planlint: axes not found: {axes_path}", file=sys.stderr)
         return 1
 
-    axes = yaml_load(axes_path.read_text(encoding="utf-8"))
-    if not isinstance(axes, list):
-        print(f"planlint: {axes_path} must be a YAML list of axis rows", file=sys.stderr)
+    axes = _axis_rows(yaml_load(axes_path.read_text(encoding="utf-8")))
+    if axes is None:
+        print(
+            f"planlint: {axes_path} must be a YAML list of axis rows "
+            "or a mapping with an 'axes' list",
+            file=sys.stderr,
+        )
         return 1
 
     errors = lint(plan.read_text(encoding="utf-8"), axes)

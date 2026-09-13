@@ -16,3 +16,7 @@ def main(argv: list[str] | None = None) -> int:
     for country in countries:
         print(country)
     return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

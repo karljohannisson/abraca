@@ -20,6 +20,8 @@ Template: [templates/plan.md](templates/plan.md). Decision log starts empty: [te
 
 ## Plan lint (must all pass before any task runs)
 
+From the repo root, run `PYTHONPATH=.nose python3 -m planlint` against `product/phase-4-plan.md` and `product/axes.yaml`. Exit 0 is the gate. See [plan-lint.md](plan-lint.md). The boxes below are the rest of the checklist. They are not a substitute for the command.
+
 - [ ] Every non-parked Phase 2 id is cited by at least one task.
 - [ ] Every locked axis has **exactly one** task with `encodes: [that id]`.
 - [ ] No task `encodes` two ids; no task `encodes` a dormant/frozen reason.

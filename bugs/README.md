@@ -4,9 +4,9 @@ Tracked defects. Status lives on each file. Scorer grains that are not Goal 0 wo
 
 | Id | Status | What |
 |---|---|---|
-| [example-cli-never-calls-main](example-cli-never-calls-main.md) | open | Recorded `python3 -m world` never calls `main()` |
-| [planlint-axes-must-be-a-list](planlint-axes-must-be-a-list.md) | open | Planlint rejects `{version, axes}` registries |
-| [planlint-ignores-template-encodes](planlint-ignores-template-encodes.md) | open | Planlint misses markdown `encodes:` bullets |
+| [example-cli-never-calls-main](example-cli-never-calls-main.md) | fixed | Recorded `python3 -m world` never calls `main()` |
+| [planlint-axes-must-be-a-list](planlint-axes-must-be-a-list.md) | fixed | Planlint rejects `{version, axes}` registries |
+| [planlint-ignores-template-encodes](planlint-ignores-template-encodes.md) | fixed | Planlint misses markdown `encodes:` bullets |
 | [authority-site-is-module](authority-site-is-module.md) | fixed | Authority site is the whole file, not the symbol’s enclosing function |
 | [signature-rename-fail-loud](signature-rename-fail-loud.md) | fixed (minimal) | `shape: signature_rename` does not check type or attribute breakage |
 

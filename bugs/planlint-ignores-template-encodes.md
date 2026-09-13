@@ -1,6 +1,6 @@
 # Planlint ignores template and example `encodes:` bullets
 
-**Status:** open.
+**Status:** fixed.
 
 **Where.** `.nose/planlint/__init__.py` `_task_blocks`.
 
