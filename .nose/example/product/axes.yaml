@@ -1,0 +1,26 @@
+# Filled in Phase 3. authority filled in Phase 4 authority tasks.
+version: 1
+axes:
+  - id: regions
+    plain: The list of regions may grow.
+    statement: The set of world regions may grow.
+    because: New regions are added without changing anything else.
+    origin: brief
+    frequency: 4
+    p: 0.75
+    shape: set_grows
+    status: locked
+    requirements: [FR-1]
+    authority:
+      symbol: world.regions
+      path: src/world/regions.py
+    verifies:
+      - tests/test_regions.py
+
+  - id: greetings
+    statement: Greeting output may be added.
+    p: low
+    shape: unknown
+    status: dormant
+    authority: null
+    verifies: []

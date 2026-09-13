@@ -1,0 +1,13 @@
+# Recorded example: this tree has finished the whole loop.
+# A fresh clone starts instead with phase: 1 and an empty product/.
+version: 1
+phase: maintenance
+phase_name: maintenance
+status: maintenance
+next_instructions: ../docs/workflow/orchestrate.md
+artifacts:
+  - product/status.yaml
+human:
+  technical_depth: low
+  domains: [geo trivia]
+w_baseline: 0.75
