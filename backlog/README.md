@@ -8,15 +8,15 @@ Goal 0 is still “human talks, agent leads, software matches the need and stays
 
 | # | Item | Impact / effort |
 |---|---|---|
-| 1 | [finished-tiny-run.md](finished-tiny-run.md) | High / medium |
-| 2 | [hunt-unavoidable.md](hunt-unavoidable.md) | High / low |
-| 3 | [plan-lint-checker.md](plan-lint-checker.md) | Medium-high / low |
-| 4 | [runnable-slice-before-handover.md](runnable-slice-before-handover.md) | High on need-meeting / medium |
-| 5 | [later-change-task-eval.md](later-change-task-eval.md) | High on knowing, not first-clone odds / medium |
+| 1 | [finished-tiny-run.md](finished-tiny-run.md) | High / medium — **done** (`.nose/example/`) |
+| 2 | [hunt-unavoidable.md](hunt-unavoidable.md) | High / low — **done** (CLI fail-closed) |
+| 3 | [plan-lint-checker.md](plan-lint-checker.md) | Medium-high / low — **done** (`.nose/planlint/`) |
+| 4 | [runnable-slice-before-handover.md](runnable-slice-before-handover.md) | High on need-meeting / medium — **done** (orchestrate docs) |
+| 5 | [later-change-task-eval.md](later-change-task-eval.md) | High on knowing, not first-clone odds / medium — **cards shipped** (`.nose/example/eval/`); execution pending |
 
 Larger envelope for 2–3 plus process automation: [script-driven-workflow-loop.md](script-driven-workflow-loop.md). Do not build that *and* a second plan linter.
 
 **Below this list for Goal 0** (metric honesty, next time the scorer is open):
 
-- [bugs/authority-site-is-module.md](../bugs/authority-site-is-module.md)
-- [bugs/signature-rename-fail-loud.md](../bugs/signature-rename-fail-loud.md)
+- [bugs/authority-site-is-module.md](../bugs/authority-site-is-module.md) — **fixed** 2026-09-13
+- [bugs/signature-rename-fail-loud.md](../bugs/signature-rename-fail-loud.md) — **fixed (minimal)** 2026-09-13
