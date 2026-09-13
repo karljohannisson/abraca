@@ -71,7 +71,7 @@ Optional, **not** in the portable seed: a Grok (or other host) adapter that is t
 
 ## Collision
 
-The seed-wave scorer work is on `main`. Transcript: [brainstorming/planned-changes.md](../brainstorming/planned-changes.md).
+The seed-wave scorer work is on `main`. Archive: [brainstorming/archive/planned-changes.md](../brainstorming/archive/planned-changes.md).
 
 Do not put this in `.nose/maintainability/`. Process ≠ metric. Prefer one plan lint: this package’s `check`, or [plan-lint-checker.md](plan-lint-checker.md), not both.
 

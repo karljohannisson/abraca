@@ -1,8 +1,8 @@
-# In-flight seed changes (do not collide)
+# Seed-wave plan (done)
 
-Status: **implemented on branch `feat/language-neutral-metric`**. PR not opened (no git/GitHub credentials in this session). Another agent can still use `product/`.
+Status: **done**. Landed on `main` (`fc8729a`, 2026-09-13). Fast-forwarded from `feat/language-neutral-metric`. Not in-flight. Do not treat this file as a lock on any path.
 
-Owner of this plan: the session that wrote this file. Path to hand another agent: `.reviews/planned-changes.md`.
+This is an archive of what we planned. What to do next is [backlog/](../../backlog/). Parked scorer grains are [bugs/](../../bugs/).
 
 ## What this is
 
@@ -15,7 +15,9 @@ The seed (`.nose/` plus root `AGENTS.md`) will change so that:
 
 Parked: a token/correctness/maintainability benchmark, restoring the deleted chat app, statement-level dead-code analysis, a JavaScript backend, CI.
 
-## Collision rule for a parallel agent
+## Collision rule (historical)
+
+This table was the lock while the waves ran. It does not apply anymore.
 
 | You may write | Do not write |
 |---|---|
@@ -228,11 +230,9 @@ Principles stay the domain. \(W\) stays a pure function of atom totals. A langua
 
 Module-level volume and no JS parser in this stack is laziness. The seam is the option. A full multi-language analyzer is not.
 
-## Open decisions (defaults if nobody answers)
+## Open decisions (how they landed)
 
-- Authority site stays the module unit.
-- `signature_rename` fail-loud stays unimplemented.
-- No pytest.
-- No PR until waves 0–3 exist as commits on a branch.
-
-Update this file if the plan moves.
+- Authority site stayed the module unit. [bugs/authority-site-is-module.md](../../bugs/authority-site-is-module.md)
+- `signature_rename` fail-loud stayed unimplemented. [bugs/signature-rename-fail-loud.md](../../bugs/signature-rename-fail-loud.md)
+- No pytest. Tests run with `unittest discover`.
+- Work merged to local `main` instead of a PR.
