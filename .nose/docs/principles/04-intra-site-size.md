@@ -27,8 +27,8 @@ Lower is cheaper.
 | Symbol | Meaning |
 |---|---|
 | \(r\), \(P(r)\), sites | Same registry and confirmed representations as principle 1 |
-| \(n(s)\) | AST **statement** count of the enclosing unit of site \(s\) (not physical lines, not comments/blanks) |
-| \(T\) | Working-set bound. For Python: \(T=15\) statements |
+| \(n(s)\) | Statement count of the enclosing unit of site \(s\) (not physical lines, not comments/blanks) |
+| \(T\) | Per-language working-set bound. Python: 15 statements ([measure/python.md](../measure/python.md)) |
 | \(Z(r)\) | Mean excess size: \(\frac{1}{k(r)}\sum_s \max(n(s)-T,\,0)\) |
 
 Mean, not sum: extra sites are [principle 1](01-co-change-degree.md). A data table that is one assignment is one statement even if it lists many members — essential bulk of \(r\) is not this principle.
@@ -39,7 +39,7 @@ Frozen \(r\) are omitted with principle 1.
 
 1. Take confirmed sites for \(r\).
 2. Resolve each to its enclosing unit.
-3. Count AST statements in that unit.
+3. Count statements in that unit (language backend).
 4. Average the excess over \(T\).
 
 Fully automatic given confirmed sites.

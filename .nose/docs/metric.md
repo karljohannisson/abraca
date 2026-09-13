@@ -1,6 +1,6 @@
 # Combined maintainability metric
 
-Goal 3. One number on a Python codebase, built only from the [ten atoms](principles/README.md). Lower is cheaper. Version **1**.
+One number \(W\) from the [ten atoms](principles/README.md). Lower is cheaper. Version **1**. Language-neutral. Python fills the atoms in [measure/python.md](measure/python.md).
 
 The atoms stay the diagnosis. This file only says how they become one score \(W\), and what the scanner may claim.
 
@@ -11,9 +11,9 @@ Required for atoms 1–9 and for \(W\) (paths are at the **product root**, not i
 - `product/axes.yaml` — locked axes with \(P\), shape, authority path, optional `verifies` and `extra_sites`
 - `product/entry-points.yaml` — program starts / public API; optional `code_roots`, `exclude`, `confirmed_live`
 
-CLI (from the product root): `PYTHONPATH=.nose python3 -m maintainability`.
+CLI (from the product root): `PYTHONPATH=.nose python3 -m maintainability`. Optional `--max-w` fails the process if headline \(W\) is above the cap (see [measure/python.md](measure/python.md)).
 
-Without a registry, atoms 1–9 are undefined. Accidental volume can still run from entry-point defaults.
+Without `product/axes.yaml`, the CLI exits 2. Atoms 1–9 are undefined. Volume is not scored on its own.
 
 ## \(P(r)\)
 
@@ -23,7 +23,7 @@ Without a registry, atoms 1–9 are undefined. Accidental volume can still run f
 | medium | \(0.5\) |
 | low | \(0.25\) |
 
-Numeric \(P \in [0,1]\) in yaml is allowed and used as-is. Phase 3 stores human frequency 1–5 and writes `p` from that table ([workflow/phase-3-axes.md](workflow/phase-3-axes.md)). Dormant and proposed rows are omitted from every sum. Frozen reasons are not rows.
+Numeric \(P \in [0,1]\) in yaml is allowed and used as-is. Non-finite values and values outside that interval are a registry error. Phase 3 stores human frequency 1–5 and writes `p` from that table ([workflow/phase-3-axes.md](workflow/phase-3-axes.md)). Dormant and proposed rows are omitted from every sum. Frozen reasons are not rows.
 
 ## Atoms (unchanged)
 
@@ -101,20 +101,13 @@ W = \mathrm{Edit}+\mathrm{Load}+\mathrm{Orient}+\mathrm{Check}+\mathrm{Mass} \in
 
 Equal group weight so Load’s four atoms do not outvote Orient’s one.
 
-## Python application
+## Application notes
 
-- Code roots: `entry-points.yaml` `code_roots` if set, else `src/` if present else `.`, plus `tests/` if present. `exclude` subtracts prefixes. Do not parse `.nose/` as product code.
-- Strip a unique `src/` (or declared root) before package comparisons so `src/a` vs `src/b` is \(L=4\).
-- One deployable unless `deployables` lists path prefixes.
-- Statements: `ast.stmt` in the enclosing unit, recursing into `if`/`for`/`try` bodies, not into nested `def`/`class` (those are other units). \(T=15\).
-- Cognitive complexity: Sonar/Campbell on that unit (see implementation).
-- Findability query: identifier-style tokens from `statement` and `id`, stopwords dropped; do not add the authority path.
-- Live authorities are reachability roots. `verifies` tests are not unreachable. `confirmed_live` paths are not unreachable.
-- `origin`, `plain`, `because`, `frequency`, `requirements` on an axis are ignored. They are Phase 3 fields ([workflow/artifacts.md](workflow/artifacts.md)).
+Language-specific grains live in [measure/python.md](measure/python.md). `origin`, `plain`, `because`, `frequency`, `requirements` on an axis are ignored. They are Phase 3 fields ([workflow/artifacts.md](workflow/artifacts.md)).
 
 ## What \(W\) can claim without a software human
 
-Goal 3 is the backstop for [workflow/phase-4-task.md](workflow/phase-4-task.md) and [workflow/phase-5-handover.md](workflow/phase-5-handover.md). The human does not drive phases or classify sites.
+The \(W\) gate is the backstop for [workflow/phase-4-task.md](workflow/phase-4-task.md) and [workflow/phase-5-handover.md](workflow/phase-5-handover.md). The human does not drive phases or classify sites.
 
 A Phase 4 **plan** is not scored. Lint it against `axes.yaml` ([workflow/phase-4-plan.md](workflow/phase-4-plan.md)) before any task. Architecture is one authority per locked axis — not class diagrams that skip the registry.
 

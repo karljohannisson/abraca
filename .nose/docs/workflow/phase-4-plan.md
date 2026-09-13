@@ -24,7 +24,7 @@ Template: [templates/plan.md](templates/plan.md). Decision log starts empty: [te
 - [ ] No task `encodes` two ids; no task `encodes` a dormant/frozen reason.
 - [ ] Authority tasks appear before any task that `uses` that axis.
 - [ ] Each task has: id, depends-on, requirement ids, encodes/uses, acceptance, `artifacts_to_load`, verify steps, commit message pattern `Tnnn: …`.
-- [ ] Acceptance includes: tests; hunt extras of every locked axis touched and delete them; `PYTHONPATH=.nose python3 -m maintainability`; headline \(W\) ≤ `w_baseline` (or first run sets baseline) unless `decisions.md` records why and that it is required by a Phase 2 id.
+- [ ] Acceptance includes: tests; hunt extras of every locked axis touched and delete them; `PYTHONPATH=.nose python3 -m maintainability` (exit 0); headline \(W\) ≤ `w_baseline` (or first run sets baseline) unless `decisions.md` records why and that it is required by a Phase 2 id.
 - [ ] Tasks do not include the whole of `phase-2.md` in `artifacts_to_load` — only cited ids (copy those sections into the task card so the task agent need not read the rest).
 
 If lint fails, fix the plan. Do not start tasks.

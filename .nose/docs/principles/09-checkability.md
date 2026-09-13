@@ -39,19 +39,19 @@ Change shape (from the registry) decides whether fail-loud applies:
 | Shape | Fail-loud means |
 |---|---|
 | Set grows; uses should pick up members automatically | Fail-loud **does not apply**. \(V=0\) if verifies *read* the authority. Iteration is the correct use. |
-| New variant needs handling | Exhaustive match / typed visitor without default. |
-| Signature / field rename | Type-checker or attribute errors at uses. |
+| New variant needs handling | Exhaustive match / typed visitor without default. Python implements exhaustive `match` on the authority subject. |
+| Signature / field rename | Type-checker or attribute errors at uses. **Not implemented.** [bugs/signature-rename-fail-loud.md](../../../bugs/signature-rename-fail-loud.md). |
 | Formula / value | No structural fail-loud; verifies that read inputs/authority and assert outputs. |
 
 ## How \(V\) is obtained
 
 1. Take `verifies` and the authority from the registry; take change shape.
-2. AST: does a verifies test *read* the authority (attribute/iteration/parametrize from it) vs recopy tokens?
-3. If fail-loud applies: AST for exhaustive matches / typed uses.
+2. Language backend: does a verifies test *read* the authority (attribute/iteration/parametrize from it) vs recopy tokens?
+3. If fail-loud applies and the backend implements that shape: exhaustive matches or typed uses.
 4. Else if any test imports the module → at best \(V=2\).
 5. Read \(V\) off the table.
 
-Automatic given registry tags + AST, for the shapes above. Type-level fail-loud assumes a type checker is in the project (declared setup). Headline uses confirmed `verifies` links; untagged tests that actually read the authority may be confirmed into the registry and then count.
+Automatic given registry tags plus a language backend, for the shapes that backend implements. Type-level fail-loud assumes a type checker is in the project (declared setup) and is not implemented for Python yet. Headline uses confirmed `verifies` links; untagged tests that actually read the authority may be confirmed into the registry and then count. Python details: [measure/python.md](../measure/python.md).
 
 Coverage **percentage** is not \(V\). It can *propose* “this unit is untested” (\(V\) at least 2 if no import). CRAP = [principle 5](05-intra-site-complexity.md) × (lack of coverage); do not fold coverage into this ordinal beyond the table.
 

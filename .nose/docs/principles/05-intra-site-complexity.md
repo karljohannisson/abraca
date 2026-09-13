@@ -40,7 +40,7 @@ Mean, not sum: extra sites are principle 1.
 
 1. Take confirmed sites for \(r\).
 2. Resolve each enclosing unit.
-3. Compute cognitive complexity on that AST.
+3. Compute cognitive complexity on that unit (language backend). Python: [measure/python.md](../measure/python.md).
 4. Average.
 
 Fully automatic given confirmed sites. Headline uses confirmed sites. A missed clone in a gnarly function under-counts.

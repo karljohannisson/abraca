@@ -30,7 +30,7 @@ Minor judgment calls are allowed. If you decide: append `product/decisions.md` (
    PYTHONPATH=.nose python3 -m maintainability
    ```
 
-4. Headline \(W\) must not exceed `status.w_baseline`. If `w_baseline` is null, set it to this headline in `status.yaml`. If \(W\) rose: fix, or append a decision that names the Phase 2 id that forced it. Do not claim \(k=1\) from the floor.
+4. Headline \(W\) must not exceed `status.w_baseline`. If `w_baseline` is null, set it to this headline in `status.yaml`. If the CLI exits 1, \(W\) rose: fix, or append a decision that names the Phase 2 id that forced it and rerun with `--max-w` equal to the new headline. Do not claim \(k=1\) from the floor.
 5. Commit: message `Tnnn: <what>` referencing the task id. One task, one commit.
 
 ## Report to the orchestrator (end of context)

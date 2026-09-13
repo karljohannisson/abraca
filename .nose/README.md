@@ -9,6 +9,7 @@ Start: [docs/README.md](docs/README.md). Orchestration: [docs/workflow/orchestra
 | `docs/principles/` — ten atoms | `product/` — phase artifacts (**agent-written**) |
 | `docs/workflow/` — phases 1–5 | `src/<name>/` — authorities (Phase 4) |
 | `docs/metric.md` — combined \(W\) | `tests/` — product `verifies` |
+| `docs/measure/` — Python backend notes | |
 | `maintainability/` — `python -m maintainability` | |
 | `tests/` — tests for that metric | |
 

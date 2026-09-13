@@ -31,7 +31,7 @@ Templates: [templates/](templates/).
 
 `status`: `locked` (design for it) · `dormant` (no code until shape is known). No `proposed` after Phase 3 recap.
 
-`p`: numeric in \([0,1]\) (from frequency) or `high` / `medium` / `low` (1.0 / 0.5 / 0.25). Scorer accepts both. `frequency` is ignored by the scorer, as are `plain`, `because`, `origin`, `requirements`.
+`p`: numeric in \([0,1]\) (from frequency) or `high` / `medium` / `low` (1.0 / 0.5 / 0.25). Scorer accepts both and rejects non-finite or out-of-range numbers. `frequency` is ignored by the scorer, as are `plain`, `because`, `origin`, `requirements`.
 
 `shape` ([principle 9](../principles/09-checkability.md)):
 
@@ -45,7 +45,7 @@ Templates: [templates/](templates/).
 
 Exactly one authority per locked row, filled in Phase 4. Members live in code, not yaml.
 
-`entry-points.yaml`: `code_roots`, `exclude` (always exclude `.nose`), `entry_points`, optional `confirmed_live`, `deployables`. Run from product root: `PYTHONPATH=.nose python3 -m maintainability`.
+`entry-points.yaml`: `code_roots`, `exclude` (the loader always adds `.nose` when that directory exists at the product root), `entry_points`, optional `confirmed_live`, `deployables`. Run from product root: `PYTHONPATH=.nose python3 -m maintainability`. Python grains: [measure/python.md](../measure/python.md).
 
 ## Layout after a clone
 

@@ -37,8 +37,8 @@ Cycles are not a separate principle: a cycle-mate you reference is already in \(
 ## How \(H\) is obtained
 
 1. Take confirmed sites for \(r\).
-2. Collect Name / Attribute / import uses in the enclosing unit.
-3. Resolve to same-repo definitions when static resolution allows.
+2. Collect name, attribute, and import uses in the enclosing unit (language backend).
+3. Resolve to same-repo definitions when static resolution allows. Third-party and stdlib do not count. Python: [measure/python.md](../measure/python.md).
 4. Drop exclusions; count distinct defs; average.
 
 **Automatic floor:** statically resolved project refs. Dynamic `getattr`, import-by-string, plugin entry points under-count until confirmed.

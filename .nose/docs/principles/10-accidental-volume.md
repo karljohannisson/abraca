@@ -24,7 +24,7 @@ Lower is cheaper. \(u\in[0,1]\).
 
 | Symbol | Meaning |
 |---|---|
-| Statement | Same AST statement grain as principle 4 |
+| Statement | Same statement grain as principle 4 |
 | Entry points | Declared roots (setup) |
 | Reachable | Statically referenced, transitively, from an entry point (and from live authorities, which are roots too) |
 | Unreachable | Statements not in that closure |
@@ -33,7 +33,9 @@ Live authorities are roots so a library encoding is not “dead” just because 
 
 ## Setup (required)
 
-**Entry points:** modules/functions that start the program or form the public API. Defaults if undeclared: `**/__main__.py`, `pyproject.toml` `[project.scripts]`, files named `main.py` / `app.py`. Packages meant to be imported should list `__all__` or an explicit export set.
+**Entry points:** modules/functions that start the program or form the public API. If yaml lists no `path`, Python defaults are `**/__main__.py`, `main.py`, `app.py`, and `pyproject.toml` `[project.scripts]`. Packages meant to be imported should list `__all__` or an explicit export set. The CLI still requires `product/axes.yaml`.
+
+Python reachability is **module-import closure**. A live import marks the whole file reached. Nested unused functions in a live file do not add mass. Details: [measure/python.md](../measure/python.md).
 
 ## How \(u\) is obtained
 
@@ -41,7 +43,7 @@ Live authorities are roots so a library encoding is not “dead” just because 
 2. From entry points + live authorities, follow static same-repo references (imports, names, attributes).
 3. \(u =\) statements outside the closure / all statements.
 
-**Automatic floor:** static reachability. Python dynamics (`importlib`, plugins, string imports) mark live code dead until confirmed. Headline uses **confirmed** unreachable (scanner proposals + confirm), same rule as \(k\). “Vulture found it” is not headline without confirm when the project uses plugins.
+**Automatic floor:** static reachability from the language backend. Dynamics (`importlib`, plugins, string imports) mark live code dead until confirmed. Headline uses **confirmed** unreachable (scanner proposals + confirm), same rule as \(k\). “Vulture found it” is not headline without confirm when the project uses plugins.
 
 Do not count as unreachable: `TYPE_CHECKING` stubs that are referenced, `__all__` exports of a declared API, tests for live authorities (`verifies` and tests that import those modules). Tests for *only* dead code die with it.
 
