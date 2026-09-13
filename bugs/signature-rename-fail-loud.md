@@ -1,6 +1,6 @@
 # `signature_rename` fail-loud is not implemented
 
-**Status:** parked.
+**Status:** fixed (honest minimal version). The scorer now distinguishes `signature_rename` from `set_grows`: fail-loud is unmeasured for this shape, so a verifies test that reads the authority scores \(V=1\), never \(V=0\). No type checker was built. Documented in principle 9 and `.nose/docs/measure/python.md`.
 
 **Where.** `checkability` in `.nose/maintainability/atoms.py`. Python `match` walk in `.nose/maintainability/languages/python.py`.
 
