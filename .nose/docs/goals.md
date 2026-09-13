@@ -1,3 +1,4 @@
+0. This repo should be a help for a human to go from ideas to finished software together with an AI. The AI should lead the different phases and help achieve high quality maintainable software that meets the need of the human.
 1. Find all atomic fundamental principles impacting the maintainability of a code base, either making it less risky and cheaper, or making it riskier and more expensive. The principles must be generally applicable regardless of language, domain, size, project age, etc. They must together cover everything impacting this, but without overlapping each other, and being small enough that they can't be broken down further.
 
    Locked. Map: [principles/README.md](principles/README.md).
