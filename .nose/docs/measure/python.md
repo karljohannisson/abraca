@@ -23,7 +23,7 @@ If `entry_points` has no `path`, roots include `**/__main__.py`, `main.py`, `app
 
 ## Authority site
 
-The authority site is the **module** of `authority.path`, not the enclosing function of `authority.symbol`. Tracked in [bugs/authority-site-is-module.md](../../../bugs/authority-site-is-module.md).
+The authority site is the **enclosing unit** of `authority.symbol` in `authority.path`: the function (or class) unit whose qname equals the symbol. If `authority.symbol` is missing or does not match a unit in the file, it falls back to the module body unit. Principle 4 (intra-site size) measures the innermost function that holds the encoding, or the module body if the encoding is not in a function. Previously tracked in [bugs/authority-site-is-module.md](../../../bugs/authority-site-is-module.md).
 
 ## Not implemented
 

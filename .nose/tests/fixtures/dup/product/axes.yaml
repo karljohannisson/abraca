@@ -18,6 +18,19 @@ axes:
         status: confirmed
         strength: meaning
 
+  - id: report-formats
+    statement: The set of report formats may grow.
+    because: New report formats can be added without changing anything else.
+    origin: brief
+    p: high
+    shape: set_grows
+    status: locked
+    authority:
+      symbol: app.reports.build_report_format_registry
+      path: src/app/reports.py
+    verifies:
+    extra_sites:
+
   - id: cache
     statement: Caching may be added.
     p: low

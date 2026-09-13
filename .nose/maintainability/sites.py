@@ -23,6 +23,17 @@ class Site:
     is_authority: bool
 
 
+def _authority_unit(mod: Mod, axis: Axis) -> Unit:
+    """The enclosing unit of authority.symbol; module body when no unit matches."""
+    symbol = axis.authority_symbol
+    if not symbol:
+        return next(u for u in mod.units if u.kind == "module")
+    for u in mod.units:
+        if u.qname == symbol:
+            return u
+    return next(u for u in mod.units if u.kind == "module")
+
+
 def sites_for_axis(axis: Axis, registry: Registry, corpus: Corpus, headline: bool) -> list[Site]:
     if not axis.authority_path:
         return []
@@ -30,7 +41,7 @@ def sites_for_axis(axis: Axis, registry: Registry, corpus: Corpus, headline: boo
     mod = corpus.by_path.get(auth_path)
     if mod is None:
         return []
-    auth_unit = next(u for u in mod.units if u.kind == "module")
+    auth_unit = _authority_unit(mod, axis)
     out = [
         Site(
             axis.id,
