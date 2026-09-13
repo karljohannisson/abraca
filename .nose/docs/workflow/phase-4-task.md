@@ -11,8 +11,8 @@ Principles: [../principles/README.md](../principles/README.md). Combined \(W\): 
 ## Code rules
 
 - `encodes: [r]` — that knowledge lives only in this task’s authority path. Docstring first line = `statement` tokens (findability).
-- `uses` — iterate / lookup / import members. Do **not** recopy. Do not `if provider == …` outside the providers adapter.
-- Different locked axes do not share an enclosing function.
+- `uses` — iterate / lookup / import members. Do not recopy.
+- Encodings of two locked axes do not share a function. A façade may use several authorities.
 - Dormant / Frozen: no code.
 - `verifies` read the authority; never recopy member lists. Append the test path on the axis row in the same change.
 - New public functions are entry points only if listed, or reached from listed ones / live authorities.
@@ -25,14 +25,14 @@ Minor judgment calls are allowed. If you decide: append `product/decisions.md` (
 ## Verify (required)
 
 1. Acceptance criteria on the card.
-2. Hunt extra encodings of every locked axis you touched (same tokens, then synonyms). **Delete** them. Do not ask a human to classify sites.
-3. From the product root:
+2. From the product root:
 
    ```
    PYTHONPATH=.nose python3 -m maintainability
    ```
 
-4. Headline \(W\) must not exceed `status.w_baseline`. If `w_baseline` is null, set it to this headline in `status.yaml`. If the CLI exits 1, \(W\) rose: fix, or append a decision that names the Phase 2 id that forced it and rerun with `--max-w` equal to the new headline. Do not claim \(k=1\) from the floor.
+3. If stdout lists scan extras: delete the named token recopy. Do not confirm a use as `extra_sites`. Do not confirm a verifies file that only iterates. Then run the CLI again.
+4. Headline \(W\) must not exceed `status.w_baseline`. If `w_baseline` is null, write this headline. Do not bump `w_baseline` because composition landed. `--max-w` only if Phase 2 requires keeping a second encoding: append a decision naming that Phase 2 id, rerun with `--max-w` equal to the new headline, and write that headline to `w_baseline`. Do not claim \(k=1\) from the floor.
 5. Commit: message `Tnnn: <what>` referencing the task id. One task, one commit.
 
 ## Report to the orchestrator (end of context)

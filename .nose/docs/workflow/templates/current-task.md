@@ -9,6 +9,7 @@
     FR-1: …
 - acceptance:
     - …
-    - verifies read the authority
-    - no extra sites; W gate
+    - verifies iterate the authority
+    - CLI extras none
+    - W gate
 - commit: `T001: …`

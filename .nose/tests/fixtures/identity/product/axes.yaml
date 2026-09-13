@@ -1,0 +1,13 @@
+version: 1
+axes:
+  - id: items
+    statement: The set of items may grow.
+    p: 1.0
+    shape: set_grows
+    status: locked
+    authority:
+      symbol: app.items
+      path: src/app/items.py
+    verifies:
+      - tests/test_items.py
+    extra_sites:

@@ -12,7 +12,7 @@ from maintainability.atoms import AtomTotals, score_atoms
 from maintainability.combined import Combined, combined
 from maintainability.corpus import build_corpus
 from maintainability.registry import RegistryError, UnresolvedError, bind_registry, load_registry
-from maintainability.sites import sites_for_axis
+from maintainability.sites import ExtraHit, extra_hits_for_axis
 from maintainability.yaml_lite import YamlError, load_path
 
 
@@ -51,16 +51,14 @@ def main(argv: list[str] | None = None) -> int:
     floor = score_atoms(bound, corpus, headline=False)
     wh = combined(headline)
     wf = combined(floor)
-    hidden = _hidden_extras(bound, corpus)
+    extras = _scan_extras(bound, corpus)
     if args.json:
-        print(json.dumps(_as_json(headline, floor, wh, wf, hidden), indent=2))
+        print(json.dumps(_as_json(headline, floor, wh, wf, extras, root), indent=2))
     else:
-        print(_as_text(headline, floor, wh, wf, hidden))
-    if hidden:
-        rel = ", ".join(sorted(str(p.relative_to(root)) for p, _ in hidden))
+        print(_as_text(headline, floor, wh, wf, extras, root))
+    if extras:
         print(
-            "scan extras found but hidden by a headline k=1 "
-            f"(delete the file(s) or confirm them as extra_sites): {rel}",
+            "scan extras found: delete the listed token recopy (do not confirm a use)",
             file=sys.stderr,
         )
         return 1
@@ -70,28 +68,18 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-def _hidden_extras(registry, corpus) -> list[tuple[Path, str]]:
-    """Unconfirmed floor scan sites, i.e. what a k=1 claim would hide.
-
-    The headline's k=1 claim comes from axes.yaml having no confirmed
-    extra_sites for the axis. A scan extra is excused when the path was
-    deleted or confirmed as an extra_site in yaml.
-    """
-    out: list[tuple[Path, str]] = []
-    seen: set[Path] = set()
+def _scan_extras(registry, corpus) -> list[ExtraHit]:
+    out: list[ExtraHit] = []
     for ax in registry.axes:
-        confirmed = {(registry.root / ex.path).resolve() for ex in ax.extra_sites if ex.status == "confirmed"}
-        for site in sites_for_axis(ax, registry, corpus, headline=False):
-            if (
-                site.origin != "scan"
-                or site.path in seen
-                or site.path in confirmed
-                or not site.path.is_file()
-            ):
-                continue
-            seen.add(site.path)
-            out.append((site.path, ax.id))
+        out.extend(extra_hits_for_axis(ax, registry, corpus))
     return out
+
+
+def _rel(path: Path, root: Path) -> str:
+    try:
+        return str(path.relative_to(root))
+    except ValueError:
+        return str(path)
 
 
 def _status_baseline(root: Path) -> float | None:
@@ -113,7 +101,7 @@ def _status_baseline(root: Path) -> float | None:
         return None
 
 
-def _as_text(h: AtomTotals, f: AtomTotals, wh: Combined, wf: Combined, hidden=()) -> str:
+def _as_text(h: AtomTotals, f: AtomTotals, wh: Combined, wf: Combined, extras=(), root: Path | None = None) -> str:
     lines = [
         f"maintainability metric v{VERSION}",
         f"W (headline) {wh.W:.4f}   [0,5] lower=cheaper",
@@ -140,20 +128,21 @@ def _as_text(h: AtomTotals, f: AtomTotals, wh: Combined, wf: Combined, hidden=()
         "",
         "per-axis:",
     ]
-    if hidden:
-        lines.append("")
-        lines.append("scan extras (floor; confirm or delete):")
-        for p, ax_id in hidden:
-            lines.append(f"  {p}  (axis: {ax_id})")
     for a in h.per_axis:
         lines.append(
             f"  {a.id:18} P={a.p:.2f} k={a.k} L={a.L} S={a.S} "
             f"Z={a.Z:.1f} C={a.C:.1f} M={a.M:.1f} H={a.H:.1f} F={a.F} V={a.V}"
         )
+    if extras:
+        lines.append("")
+        lines.append("scan extras (floor; delete the listed token recopy):")
+        for hit in extras:
+            rel = _rel(hit.path, root) if root is not None else str(hit.path)
+            lines.append(f"  {hit.axis}  {rel}:{hit.lineno}  {hit.unit}  {hit.kind}  {hit.token}")
     return "\n".join(lines)
 
 
-def _as_json(h, f, wh, wf, hidden=()) -> dict:
+def _as_json(h, f, wh, wf, extras=(), root: Path | None = None) -> dict:
     def atoms(t: AtomTotals) -> dict:
         return {
             "degree": t.degree,
@@ -184,7 +173,17 @@ def _as_json(h, f, wh, wf, hidden=()) -> dict:
         "version": VERSION,
         "headline": {**atoms(h), "combined": comb(wh)},
         "floor": {**atoms(f), "combined": comb(wf)},
-        "hidden_scan_extras": [str(p) for p, _ in hidden],
+        "scan_extras": [
+            {
+                "axis": hit.axis,
+                "path": _rel(hit.path, root) if root is not None else str(hit.path),
+                "lineno": hit.lineno,
+                "unit": hit.unit,
+                "token": hit.token,
+                "kind": hit.kind,
+            }
+            for hit in extras
+        ],
     }
 
 

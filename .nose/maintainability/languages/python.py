@@ -26,6 +26,19 @@ class ImportRoot:
     path: Path
 
 
+@dataclass(frozen=True)
+class Members:
+    strings: frozenset[str]
+    names: frozenset[str]
+
+
+@dataclass(frozen=True)
+class Hit:
+    lineno: int
+    kind: str
+    token: str
+
+
 def parse_file(path: Path, root: Path, import_roots: tuple[ImportRoot, ...]) -> Mod | None:
     try:
         source = path.read_text(encoding="utf-8")
@@ -424,66 +437,135 @@ class _Cog(ast.NodeVisitor):
         self.generic_visit(node)
 
 
-def seed_members(mod: Mod) -> set[str]:
+def seed_members(mod: Mod) -> Members:
     tree = _tree(mod)
     if tree is None:
-        return set()
-    tokens: set[str] = set()
+        return Members(strings=frozenset(), names=frozenset())
+    strings: set[str] = set()
+    names: set[str] = set()
+    local_classes = {n.name for n in tree.body if isinstance(n, ast.ClassDef)}
+    for stmt in tree.body:
+        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if (
+            isinstance(stmt, ast.Expr)
+            and isinstance(stmt.value, ast.Constant)
+            and isinstance(stmt.value.value, str)
+            and stmt is tree.body[0]
+        ):
+            continue
+        if isinstance(stmt, ast.ClassDef):
+            _harvest_class(stmt, local_classes, strings, names)
+            continue
+        targets = _assign_target_names(stmt)
+        if "__all__" in targets:
+            continue
+        value = _assigned_value(stmt)
+        if value is None:
+            continue
+        if _is_export_list(value):
+            continue
+        if isinstance(value, ast.Dict):
+            _harvest_table_keys(value, strings)
+        elif isinstance(value, (ast.List, ast.Tuple)):
+            _harvest_registry_rows(value, strings)
+    return Members(strings=frozenset(strings), names=frozenset(names))
 
-    class V(ast.NodeVisitor):
-        def visit_Expr(self, node: ast.Expr) -> None:
-            if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
-                if node is (tree.body[0] if tree.body else None):
-                    return
-            self.generic_visit(node)
 
-        def visit_Constant(self, node: ast.Constant) -> None:
-            if isinstance(node.value, str) and 2 <= len(node.value) <= 80 and " " not in node.value:
-                tokens.add(node.value)
-                tokens.add(node.value.lower())
+def _assign_target_names(stmt: ast.stmt) -> list[str]:
+    if isinstance(stmt, ast.Assign):
+        return [t.id for t in stmt.targets if isinstance(t, ast.Name)]
+    if isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name):
+        return [stmt.target.id]
+    return []
 
-        def visit_ClassDef(self, node: ast.ClassDef) -> None:
-            bases = [b.id if isinstance(b, ast.Name) else "" for b in node.bases]
-            if "Enum" in bases:
-                for stmt in node.body:
-                    if isinstance(stmt, ast.Assign):
-                        for t in stmt.targets:
-                            if isinstance(t, ast.Name):
-                                tokens.add(t.id)
-                self.generic_visit(node)
-                return
-            tokens.add(node.name)
-            self.generic_visit(node)
 
-        def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+def _assigned_value(stmt: ast.stmt) -> ast.AST | None:
+    if isinstance(stmt, ast.Assign):
+        return stmt.value
+    if isinstance(stmt, ast.AnnAssign):
+        return stmt.value
+    return None
+
+
+def _is_export_list(value: ast.AST) -> bool:
+    if not isinstance(value, (ast.List, ast.Tuple)) or not value.elts:
+        return False
+    return all(isinstance(e, ast.Constant) and isinstance(e.value, str) for e in value.elts)
+
+
+def _harvest_table_keys(node: ast.Dict, strings: set[str]) -> None:
+    for key in node.keys:
+        if isinstance(key, ast.Constant) and isinstance(key.value, str):
+            strings.add(key.value)
+
+
+def _harvest_registry_rows(node: ast.List | ast.Tuple, strings: set[str]) -> None:
+    if not node.elts or not all(isinstance(e, ast.Call) for e in node.elts):
+        return
+    for elt in node.elts:
+        if not isinstance(elt, ast.Call):
+            continue
+        for arg in elt.args:
+            if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                strings.add(arg.value)
+                break
+
+
+def _is_enum_class(node: ast.ClassDef) -> bool:
+    for base in node.bases:
+        if isinstance(base, ast.Name) and base.id == "Enum":
+            return True
+        if isinstance(base, ast.Attribute) and base.attr == "Enum":
+            return True
+    return False
+
+
+def _harvest_class(
+    node: ast.ClassDef, local_classes: set[str], strings: set[str], names: set[str]
+) -> None:
+    if _is_enum_class(node):
+        for stmt in node.body:
+            targets: list[str] = []
+            value: ast.AST | None = None
+            if isinstance(stmt, ast.Assign):
+                targets = [t.id for t in stmt.targets if isinstance(t, ast.Name)]
+                value = stmt.value
+            elif isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name):
+                targets = [stmt.target.id]
+                value = stmt.value
+            else:
+                continue
+            names.update(targets)
+            if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                strings.add(value.value)
+        return
+    for base in node.bases:
+        bid = base.id if isinstance(base, ast.Name) else None
+        if bid is not None and bid in local_classes and bid != node.name:
+            names.add(node.name)
             return
 
-        def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-            return
 
-    V().visit(tree)
-    return {t for t in tokens if t and t not in {"return", "self"}}
-
-
-def token_hits(mod: Mod, members: set[str]) -> list[tuple[int, str, str]]:
+def token_hits(mod: Mod, members: Members) -> list[Hit]:
     tree = _tree(mod)
     if tree is None:
         return []
-    hits: list[tuple[int, str, str]] = []
-    lower_members = {m.lower() for m in members}
+    hits: list[Hit] = []
+    lower_strings = {s.lower() for s in members.strings}
 
     class V(ast.NodeVisitor):
         def visit_Constant(self, node: ast.Constant) -> None:
-            if isinstance(node.value, str) and node.value.lower() in lower_members:
-                hits.append((node.lineno, "string", node.value))
+            if isinstance(node.value, str) and node.value.lower() in lower_strings:
+                hits.append(Hit(node.lineno, "string", node.value))
 
         def visit_Name(self, node: ast.Name) -> None:
-            if node.id in members:
-                hits.append((node.lineno, "name", node.id))
+            if node.id in members.names:
+                hits.append(Hit(node.lineno, "name", node.id))
 
         def visit_Attribute(self, node: ast.Attribute) -> None:
-            if node.attr in members:
-                hits.append((node.lineno, "attr", node.attr))
+            if node.attr in members.names:
+                hits.append(Hit(node.lineno, "attr", node.attr))
             self.generic_visit(node)
 
     V().visit(tree)
@@ -546,26 +628,79 @@ def abs_import(mod_qname: str, node: ast.ImportFrom) -> str | None:
     return node.module
 
 
-def is_use(mod: Mod, lineno: int, token: str, aliases: dict[Path, set[str]], auth_qname: str) -> bool:
+def hit_is_use(mod: Mod, hit: Hit, aliases: dict[Path, set[str]]) -> bool:
     imported = aliases.get(mod.path, set())
-    return token in imported
-
-
-def attr_is_use(mod: Mod, lineno: int, aliases: dict[Path, set[str]]) -> bool:
-    imported = aliases.get(mod.path, set())
+    if not imported:
+        return False
+    if hit.kind == "name":
+        return hit.token in imported
     tree = _tree(mod)
     if tree is None:
         return False
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.Attribute) or node.lineno != lineno:
-            continue
-        base = node.value
-        if isinstance(base, ast.Name) and base.id in imported:
-            return True
+    parents = _parents(tree)
+    if hit.kind == "attr":
+        for node in ast.walk(tree):
+            if (
+                isinstance(node, ast.Attribute)
+                and node.lineno == hit.lineno
+                and node.attr == hit.token
+                and _rooted_at_alias(node.value, imported)
+            ):
+                return True
+        return False
+    if hit.kind == "string":
+        for node in ast.walk(tree):
+            if (
+                isinstance(node, ast.Constant)
+                and isinstance(node.value, str)
+                and node.lineno == hit.lineno
+                and node.value == hit.token
+                and _string_bind_use(node, parents, imported)
+            ):
+                return True
+        return False
     return False
 
 
-def string_in_use_context(mod: Mod, lineno: int, aliases: dict[Path, set[str]]) -> bool:
+def _parents(tree: ast.AST) -> dict[ast.AST, ast.AST]:
+    out: dict[ast.AST, ast.AST] = {}
+    for parent in ast.walk(tree):
+        for child in ast.iter_child_nodes(parent):
+            out[child] = parent
+    return out
+
+
+def _rooted_at_alias(node: ast.AST, imported: set[str]) -> bool:
+    cur = node
+    while isinstance(cur, ast.Attribute):
+        cur = cur.value
+    return isinstance(cur, ast.Name) and cur.id in imported
+
+
+def _string_bind_use(node: ast.AST, parents: dict[ast.AST, ast.AST], imported: set[str]) -> bool:
+    cur: ast.AST | None = node
+    while cur is not None:
+        parent = parents.get(cur)
+        if parent is None:
+            return False
+        if isinstance(parent, ast.Call):
+            return _rooted_at_alias(parent.func, imported)
+        if isinstance(parent, ast.keyword):
+            cur = parent
+            continue
+        if isinstance(parent, ast.Subscript):
+            return _rooted_at_alias(parent.value, imported)
+        if isinstance(parent, (ast.For, ast.AsyncFor, ast.comprehension)):
+            return _rooted_at_alias(parent.iter, imported)
+        if isinstance(parent, ast.Compare):
+            if any(isinstance(op, ast.In) for op in parent.ops):
+                return any(_rooted_at_alias(comp, imported) for comp in parent.comparators)
+            return False
+        if isinstance(parent, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            return False
+        if isinstance(parent, ast.stmt) and not isinstance(parent, (ast.For, ast.AsyncFor)):
+            return False
+        cur = parent
     return False
 
 
@@ -618,7 +753,12 @@ def reads_authority(mod: Mod, auth: BoundAuthority) -> bool:
                         aliases.add(a.asname or a.name)
         if isinstance(node, ast.Import):
             for a in node.names:
-                if a.name == mod_q or a.name == symbol:
+                if (
+                    a.name == mod_q
+                    or a.name == symbol
+                    or mod_q.startswith(a.name + ".")
+                    or symbol.startswith(a.name + ".")
+                ):
                     aliases.add(a.asname or a.name.split(".")[0])
     if not aliases:
         return False

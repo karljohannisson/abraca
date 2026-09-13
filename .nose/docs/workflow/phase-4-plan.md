@@ -9,7 +9,7 @@ This is **not** a class-design essay. The architecture **is** one authority per 
 ## Build the plan
 
 1. One **authority task** per `status: locked` axis: create the module whose name and first docstring line use tokens from `statement`; first member/variant only if Phase 2 says so; `verifies` that **read** the authority (no recopied lists). Set `encodes: [that-id]` and proposed `authority.symbol` / `path`. Fill those fields in `axes.yaml` in that task, not before.
-2. **Use tasks** for composition (port, app, UI). `encodes: []`. They may `uses: [axis-ids]` (read/iterate only).
+2. **Use tasks** for composition (port, app, UI). `encodes: []`. They may `uses: [axis-ids]` (read/iterate only). Joint facts live as a field on one authority, not a second table in the composer.
 3. No task for `dormant` or Frozen. No task encodes two axes. No task recopies members.
 4. Cover every non-parked `FR`/`TR`/`DR`/`XR`. If a requirement is not reachable from the task list, add a task or park the requirement (that is a Phase 2 defect — rewind if you cannot map it without a human).
 5. Order: layout / `entry-points.yaml` (exclude `.nose`) → **all authority tasks** → composition → UI → glue. Never UI before the authorities it would have to recopy.
@@ -27,7 +27,7 @@ From the repo root, run `PYTHONPATH=.nose python3 -m planlint` against `product/
 - [ ] No task `encodes` two ids; no task `encodes` a dormant/frozen reason.
 - [ ] Authority tasks appear before any task that `uses` that axis.
 - [ ] Each task has: id, depends-on, requirement ids, encodes/uses, acceptance, `artifacts_to_load`, verify steps, commit message pattern `Tnnn: …`.
-- [ ] Acceptance includes: tests; hunt extras of every locked axis touched and delete them; `PYTHONPATH=.nose python3 -m maintainability` (exit 0); headline \(W\) ≤ `w_baseline` (or first run sets baseline) unless `decisions.md` records why and that it is required by a Phase 2 id.
+- [ ] Acceptance includes: tests; hunt extras of every locked axis touched and delete them; `PYTHONPATH=.nose python3 -m maintainability` (exit 0, extras none); headline \(W\) ≤ `w_baseline` (if `w_baseline` is null, write this headline). `--max-w` only if Phase 2 requires keeping a second encoding: a decision naming that Phase 2 id, rerun `--max-w` equal to the new headline, and write that headline to `w_baseline`.
 - [ ] Tasks do not include the whole of `phase-2.md` in `artifacts_to_load` — only cited ids (copy those sections into the task card so the task agent need not read the rest).
 - [ ] A slice checkpoint exists: the first few authority tasks, then a thin runnable vertical (one screen, one command), then the rest.
 

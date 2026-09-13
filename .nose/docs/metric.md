@@ -53,7 +53,7 @@ Always report these ten. Do not drop them in favor of \(W\).
 
 Headline is what \(W\) uses. Floor is a lower bound. Printing floor \(k=1\) is not proof that \(k=1\).
 
-Token-scan extras: string literals (or names that are not imports of the authority) equal to a seeded member token, in an enclosing unit that is not the authority. Attribute access of an imported authority is a **use**, not a site.
+Token-scan extras: seeded identity tokens. Imported-authority reads, including string arguments to those reads, are uses.
 
 ## Combined \(W\)
 
@@ -113,10 +113,10 @@ A Phase 4 **plan** is not scored. Lint it against `axes.yaml` ([workflow/phase-4
 
 - The registry may be **entirely agent-authored**. Scoring does not care who typed the yaml.
 - **Floor** is automatic (authority + token-scan Name extras). The agent must not claim \(k=1\) or “no extras” from the floor.
-- **Headline** extras of Meaning+ need a hunt. The human is **not** a site classifier. Treat hunt hits as **defects to delete**, not as yaml for the human to confirm. `extra_sites` with `status: confirmed` is only for a software collaborator who is keeping an extra this slice.
+- **Headline** extras of Meaning+ need a hunt. The human is **not** a site classifier. Hunt hits are defects to delete. Confirm `extra_sites` only if keeping an extra this slice.
 - `confirmed_live` is the one metric field that may need a **product** question (“do you still use the extra-commands plugin?”), never a metrics question.
 - Translate \(W\) for the human in one sentence if it moved. Do not ask them to interpret atoms, caps, or groups.
-- A Phase 4 **task** (and then handover) is **claimable** without a software reviewer when verifies pass, hunt hits are gone, dormant/frozen code is absent, and headline \(W\) did not rise (or the rise is logged against a Phase 2 id). That is how 3 makes the agent-only implement phase trustable without someone looking at sites.
+- A Phase 4 **task** (and then handover) is **claimable** without a software reviewer when verifies pass, scan extras are gone, dormant/frozen code is absent, and headline \(W\) did not rise. A rise is allowed only when Phase 2 requires keeping a second encoding: log that id and write the new headline to `w_baseline`.
 
 ## Not \(W\)
 

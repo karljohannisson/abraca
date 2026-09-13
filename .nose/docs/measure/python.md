@@ -40,4 +40,6 @@ PYTHONPATH=.nose python3 -m maintainability
 PYTHONPATH=.nose python3 -m maintainability --max-w 1.2
 ```
 
-Exit 0: score printed. Exit 1: headline \(W\) exceeds `--max-w` or `product/status.yaml` `w_baseline` when that field is a number. Exit 2: missing or invalid registry, flow yaml, or an unresolved live authority or verifies path. Product yaml is block lists and block maps only.
+Exit 0: score printed. Exit 1: unconfirmed scan extras first (named lines on stdout), else headline \(W\) exceeds `--max-w` or `product/status.yaml` `w_baseline` when that field is a number. Exit 2: missing or invalid registry, flow yaml, or an unresolved live authority or verifies path. Product yaml is block lists and block maps only.
+
+Members are the identity of the set: table keys, the first id string of a registry row, enum members, and variant classes.

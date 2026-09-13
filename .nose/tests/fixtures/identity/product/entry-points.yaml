@@ -1,0 +1,7 @@
+code_roots:
+  - src
+  - tests
+entry_points:
+  - id: main
+    path: src/app/compose.py
+    kind: program_start

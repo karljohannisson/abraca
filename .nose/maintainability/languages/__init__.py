@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from maintainability.languages import python as py
+from maintainability.languages.python import Hit, Members
 from maintainability.model import Corpus, Mod
 from maintainability.registry import BoundAuthority
 
@@ -63,13 +64,13 @@ def default_entry_paths(root: Path) -> list[Path]:
     return py.default_entry_paths(root.resolve(), SKIP_DIRS)
 
 
-def seed_members(mod: Mod) -> set[str]:
+def seed_members(mod: Mod) -> Members:
     if mod.language == py.LANGUAGE:
         return py.seed_members(mod)
-    return set()
+    return Members(strings=frozenset(), names=frozenset())
 
 
-def token_hits(mod: Mod, members: set[str]) -> list[tuple[int, str, str]]:
+def token_hits(mod: Mod, members: Members) -> list[Hit]:
     if mod.language == py.LANGUAGE:
         return py.token_hits(mod, members)
     return []
@@ -79,21 +80,9 @@ def authority_aliases(corpus: Corpus, auth: BoundAuthority) -> dict[Path, set[st
     return py.authority_aliases(corpus, auth)
 
 
-def is_use(mod: Mod, lineno: int, token: str, aliases: dict[Path, set[str]], auth_qname: str) -> bool:
+def hit_is_use(mod: Mod, hit: Hit, aliases: dict[Path, set[str]]) -> bool:
     if mod.language == py.LANGUAGE:
-        return py.is_use(mod, lineno, token, aliases, auth_qname)
-    return False
-
-
-def attr_is_use(mod: Mod, lineno: int, aliases: dict[Path, set[str]]) -> bool:
-    if mod.language == py.LANGUAGE:
-        return py.attr_is_use(mod, lineno, aliases)
-    return False
-
-
-def string_in_use_context(mod: Mod, lineno: int, aliases: dict[Path, set[str]]) -> bool:
-    if mod.language == py.LANGUAGE:
-        return py.string_in_use_context(mod, lineno, aliases)
+        return py.hit_is_use(mod, hit, aliases)
     return False
 
 

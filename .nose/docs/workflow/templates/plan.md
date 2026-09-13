@@ -17,8 +17,9 @@ Lint: [phase-4-plan.md](../phase-4-plan.md). Do not run tasks until every box th
     FR-1: …
 - acceptance:
     - …
-    - verifies read the authority
-    - no extra sites; W gate
+    - verifies iterate the authority
+    - CLI extras none
+    - W gate
 - verify: `.nose/docs/workflow/phase-4-task.md`
 - commit: `T001: …`
 
