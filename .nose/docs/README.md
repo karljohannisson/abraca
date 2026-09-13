@@ -12,7 +12,7 @@ You orchestrate five phases. Context is treated as **reset between phases** (and
 4. Current phase instruction + listed artifacts only.
 5. How to talk: [workflow/human.md](workflow/human.md).
 
-Phases: [workflow/README.md](workflow/README.md). Schema: [workflow/artifacts.md](workflow/artifacts.md). Principles: [principles/README.md](principles/README.md). Score \(W\): [metric.md](metric.md). Python measurement: [measure/python.md](measure/python.md). Parked scorer bugs: [bugs/](../../bugs/).
+Phases: [workflow/README.md](workflow/README.md). Schema: [workflow/artifacts.md](workflow/artifacts.md). Principles: [principles/README.md](principles/README.md). Score \(W\): [metric.md](metric.md). Python measurement: [measure/python.md](measure/python.md). Parked scorer bugs: [bugs/](../../bugs/). Backlog: [backlog/](../../backlog/). Planning transcripts: [brainstorming/](../../brainstorming/).
 
 ## Layers
 
