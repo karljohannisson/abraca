@@ -1,0 +1,1 @@
+Review the repository how clear its goals are and how likely it is to achieve them with its current content and structure. Suggest concrete improvements. Prioritize subtraction over addition to make it better.

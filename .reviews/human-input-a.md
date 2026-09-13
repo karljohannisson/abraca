@@ -1,0 +1,3 @@
+It would be nice if we also added to this framework a benchmark or way of evaluating how effective the tooling is on a few axes; how maintainable is the code, how correct is the product vs what user wanted, how token efficient is the process, i.e. cost?
+
+then we could formulate benchmark tests with like inputs from a human, and then we evaluate the final product. the maintainability thing could be checked by future requirement changes coming in later and the task is to implement them so we see how maintainable the code actually is - i.e. how expensie / hard is it to maintain ?
