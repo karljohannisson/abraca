@@ -19,7 +19,7 @@ import re
 import sys
 from pathlib import Path
 
-from maintainability.yaml_lite import load as yaml_load
+from maintainability.yaml_lite import YamlError, load as yaml_load
 
 DEFAULT_PLAN = Path("product/phase-4-plan.md")
 DEFAULT_AXES = Path("product/axes.yaml")
@@ -79,8 +79,17 @@ def _task_sections(text: str):
 def _encodes_in_section(section: str) -> list[str]:
     fence = _yaml_task_block(section)
     if fence is not None:
-        data = yaml_load(fence)
-        return _ids(data.get("encodes") if isinstance(data, dict) else None)
+        try:
+            data = yaml_load(fence)
+        except YamlError:
+            data = None
+        if isinstance(data, dict):
+            return _ids(data.get("encodes"))
+        for line in fence.splitlines():
+            m = _ENCODE_LINE.match(line.strip())
+            if m:
+                return _ids(m.group(1).strip() or None)
+        return []
     for line in section.splitlines():
         m = _ENCODE_LINE.match(line.strip())
         if m:
@@ -105,8 +114,6 @@ def _yaml_task_block(section: str) -> str | None:
 
 
 def _axis_rows(raw) -> list | None:
-    if isinstance(raw, list):
-        return [r for r in raw if isinstance(r, dict)]
     if isinstance(raw, dict):
         rows = raw.get("axes")
         if isinstance(rows, list):
@@ -153,8 +160,7 @@ def main(argv: list[str] | None = None) -> int:
     axes = _axis_rows(yaml_load(axes_path.read_text(encoding="utf-8")))
     if axes is None:
         print(
-            f"planlint: {axes_path} must be a YAML list of axis rows "
-            "or a mapping with an 'axes' list",
+            f"planlint: {axes_path} must be a mapping with an 'axes' list",
             file=sys.stderr,
         )
         return 1

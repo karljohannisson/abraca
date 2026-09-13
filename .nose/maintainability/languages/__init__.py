@@ -6,6 +6,7 @@ from pathlib import Path
 
 from maintainability.languages import python as py
 from maintainability.model import Corpus, Mod
+from maintainability.registry import BoundAuthority
 
 SKIP_DIRS = {
     ".git",
@@ -17,37 +18,33 @@ SKIP_DIRS = {
     ".pytest_cache",
 }
 
-PARSERS = {py.SUFFIX: py.parse_file}
-
-
 def build_corpus(root: Path, code_roots: tuple[Path, ...], exclude: tuple[Path, ...]) -> Corpus:
     root = root.resolve()
+    import_roots = py.discover_import_roots(root)
     files: list[Path] = []
     for base in code_roots:
         if not base.exists():
             continue
-        if base.is_file() and base.suffix in PARSERS:
+        if base.is_file() and base.suffix == py.SUFFIX:
             rp = base.resolve()
             if not _excluded(rp, exclude):
                 files.append(rp)
             continue
-        for suffix, _parser in PARSERS.items():
-            for p in base.rglob(f"*{suffix}"):
-                if any(part in SKIP_DIRS for part in p.parts):
-                    continue
-                rp = p.resolve()
-                if _excluded(rp, exclude):
-                    continue
-                files.append(rp)
+        for p in base.rglob(f"*{py.SUFFIX}"):
+            if any(part in SKIP_DIRS for part in p.parts):
+                continue
+            rp = p.resolve()
+            if _excluded(rp, exclude):
+                continue
+            files.append(rp)
     files = sorted(set(files))
     modules: list[Mod] = []
     by_path: dict[Path, Mod] = {}
     symbols: list[tuple[str, str, Path]] = []
     for path in files:
-        parser = PARSERS.get(path.suffix)
-        if parser is None:
+        if path.suffix != py.SUFFIX:
             continue
-        mod = parser(path, root)
+        mod = py.parse_file(path, root, import_roots)
         if mod is None:
             continue
         modules.append(mod)
@@ -78,8 +75,8 @@ def token_hits(mod: Mod, members: set[str]) -> list[tuple[int, str, str]]:
     return []
 
 
-def authority_aliases(corpus: Corpus, auth_qname: str) -> dict[Path, set[str]]:
-    return py.authority_aliases(corpus, auth_qname)
+def authority_aliases(corpus: Corpus, auth: BoundAuthority) -> dict[Path, set[str]]:
+    return py.authority_aliases(corpus, auth)
 
 
 def is_use(mod: Mod, lineno: int, token: str, aliases: dict[Path, set[str]], auth_qname: str) -> bool:
@@ -100,15 +97,15 @@ def string_in_use_context(mod: Mod, lineno: int, aliases: dict[Path, set[str]]) 
     return False
 
 
-def mentions(mod: Mod, auth_qname: str) -> bool:
+def mentions(mod: Mod, auth: BoundAuthority) -> bool:
     if mod.language == py.LANGUAGE:
-        return py.mentions(mod, auth_qname)
+        return py.mentions(mod, auth)
     return False
 
 
-def reads_authority(mod: Mod, auth_qname: str) -> bool:
+def reads_authority(mod: Mod, auth: BoundAuthority) -> bool:
     if mod.language == py.LANGUAGE:
-        return py.reads_authority(mod, auth_qname)
+        return py.reads_authority(mod, auth)
     return False
 
 

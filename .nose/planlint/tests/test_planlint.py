@@ -16,7 +16,7 @@ from maintainability.yaml_lite import load as yaml_load
 class PlanLintTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.axes = yaml_load(AXES.read_text(encoding="utf-8"))
+        cls.axes = yaml_load(AXES.read_text(encoding="utf-8"))["axes"]
 
     def test_passing_plan_exits_zero(self):
         plan = (HERE / "fixtures" / "plan_pass.md").read_text(encoding="utf-8")

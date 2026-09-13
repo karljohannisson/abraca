@@ -23,7 +23,9 @@ If `entry_points` has no `path`, roots include `**/__main__.py`, `main.py`, `app
 
 ## Authority site
 
-The authority site is the **enclosing unit** of `authority.symbol` in `authority.path`: the function (or class) unit whose qname equals the symbol. If `authority.symbol` is missing or does not match a unit in the file, it falls back to the module body unit. Principle 4 (intra-site size) measures the innermost function that holds the encoding, or the module body if the encoding is not in a function. Previously tracked in [bugs/authority-site-is-module.md](../../../bugs/authority-site-is-module.md).
+The authority site is the unit whose qname equals `authority.symbol` in `authority.path`. Bind requires an exact unit match and a verifies file in the corpus. A miss is CLI exit 2, not the module body. Principle 4 (intra-site size) measures that unit. Previously tracked in [bugs/authority-site-is-module.md](../../../bugs/authority-site-is-module.md).
+
+Module qnames are relative to packaging import roots from `[tool.uv.workspace]` members and `module-root`, or `src/` when there is no workspace. Nested packages without a workspace keep both path segments.
 
 ## Not implemented
 
@@ -38,4 +40,4 @@ PYTHONPATH=.nose python3 -m maintainability
 PYTHONPATH=.nose python3 -m maintainability --max-w 1.2
 ```
 
-Exit 0: score printed. Exit 1: headline \(W\) exceeds `--max-w` or `product/status.yaml` `w_baseline` when that field is a number. Exit 2: missing or invalid registry.
+Exit 0: score printed. Exit 1: headline \(W\) exceeds `--max-w` or `product/status.yaml` `w_baseline` when that field is a number. Exit 2: missing or invalid registry, flow yaml, or an unresolved live authority or verifies path. Product yaml is block lists and block maps only.

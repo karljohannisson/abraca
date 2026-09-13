@@ -11,9 +11,9 @@ from maintainability import VERSION
 from maintainability.atoms import AtomTotals, score_atoms
 from maintainability.combined import Combined, combined
 from maintainability.corpus import build_corpus
-from maintainability.registry import ExtraSite, RegistryError, load_registry
+from maintainability.registry import RegistryError, UnresolvedError, bind_registry, load_registry
 from maintainability.sites import sites_for_axis
-from maintainability.yaml_lite import load_path
+from maintainability.yaml_lite import YamlError, load_path
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -30,18 +30,28 @@ def main(argv: list[str] | None = None) -> int:
     root = args.root.resolve()
     try:
         registry = load_registry(root)
+        corpus = build_corpus(root, registry.code_roots, registry.exclude)
+        bound = bind_registry(registry, corpus)
     except FileNotFoundError as exc:
         print(f"missing product registry: {exc}", file=sys.stderr)
         return 2
-    except RegistryError as exc:
+    except (RegistryError, UnresolvedError, YamlError) as exc:
         print(f"invalid registry: {exc}", file=sys.stderr)
         return 2
-    corpus = build_corpus(root, registry.code_roots, registry.exclude)
-    headline = score_atoms(registry, corpus, headline=True)
-    floor = score_atoms(registry, corpus, headline=False)
+    max_w = args.max_w if args.max_w is not None else _status_baseline(root)
+    if max_w is not None and bound.unbound_locked:
+        ids = ", ".join(bound.unbound_locked)
+        print(
+            "invalid registry: locked rows need authority {symbol, path} "
+            f"and a verifies path that exists: {ids}",
+            file=sys.stderr,
+        )
+        return 2
+    headline = score_atoms(bound, corpus, headline=True)
+    floor = score_atoms(bound, corpus, headline=False)
     wh = combined(headline)
     wf = combined(floor)
-    hidden = _hidden_extras(registry, corpus)
+    hidden = _hidden_extras(bound, corpus)
     if args.json:
         print(json.dumps(_as_json(headline, floor, wh, wf, hidden), indent=2))
     else:
@@ -54,7 +64,6 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 1
-    max_w = args.max_w if args.max_w is not None else _status_baseline(root)
     if max_w is not None and wh.W > max_w:
         print(f"W {wh.W:.4f} exceeds max {max_w:.4f}", file=sys.stderr)
         return 1
@@ -70,7 +79,7 @@ def _hidden_extras(registry, corpus) -> list[tuple[Path, str]]:
     """
     out: list[tuple[Path, str]] = []
     seen: set[Path] = set()
-    for ax in registry.live_axes():
+    for ax in registry.axes:
         confirmed = {(registry.root / ex.path).resolve() for ex in ax.extra_sites if ex.status == "confirmed"}
         for site in sites_for_axis(ax, registry, corpus, headline=False):
             if (
@@ -91,7 +100,7 @@ def _status_baseline(root: Path) -> float | None:
         return None
     try:
         data = load_path(path)
-    except OSError:
+    except (OSError, YamlError):
         return None
     if not isinstance(data, dict):
         return None

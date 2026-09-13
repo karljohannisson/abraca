@@ -1,0 +1,7 @@
+code_roots:
+  - src
+  - tests
+entry_points:
+  - id: tools
+    path: src/harness_engine/harness_engine/tools.py
+    kind: program_start

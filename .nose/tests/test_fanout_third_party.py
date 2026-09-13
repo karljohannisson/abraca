@@ -6,7 +6,7 @@ from pathlib import Path
 
 from maintainability.atoms import score_atoms
 from maintainability.corpus import build_corpus
-from maintainability.registry import load_registry
+from maintainability.registry import bind_registry, load_registry
 from project import write_project
 
 AXES = """
@@ -20,12 +20,14 @@ axes:
     authority:
       symbol: app.n
       path: src/app/n.py
-    verifies: []
+    verifies:
+      - tests/test_n.py
 """
 
 ENTRY = """
 code_roots:
   - src
+  - tests
 entry_points:
   - id: n
     path: src/app/n.py
@@ -37,7 +39,8 @@ class FanoutTests(unittest.TestCase):
     def _H(self, root: Path) -> float:
         reg = load_registry(root)
         corpus = build_corpus(root, reg.code_roots, reg.exclude)
-        return score_atoms(reg, corpus, headline=True).per_axis[0].H
+        bound = bind_registry(reg, corpus)
+        return score_atoms(bound, corpus, headline=True).per_axis[0].H
 
     def test_requests_import_does_not_increase_H(self) -> None:
         with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:
@@ -45,13 +48,19 @@ class FanoutTests(unittest.TestCase):
                 Path(a),
                 axes=AXES,
                 entry=ENTRY,
-                files={"src/app/n.py": "NAMES = ['x']\n"},
+                files={
+                    "src/app/n.py": "NAMES = ['x']\n",
+                    "tests/test_n.py": "from app.n import NAMES\nassert NAMES\n",
+                },
             )
             dirty = write_project(
                 Path(b),
                 axes=AXES,
                 entry=ENTRY,
-                files={"src/app/n.py": "import requests\nNAMES = ['x']\nrequests.get\n"},
+                files={
+                    "src/app/n.py": "import requests\nNAMES = ['x']\nrequests.get\n",
+                    "tests/test_n.py": "from app.n import NAMES\nassert NAMES\n",
+                },
             )
             self.assertEqual(self._H(clean), self._H(dirty))
             self.assertEqual(self._H(dirty), 0.0)

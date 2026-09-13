@@ -6,7 +6,7 @@ from pathlib import Path
 
 from maintainability.atoms import volume
 from maintainability.corpus import build_corpus
-from maintainability.registry import load_registry
+from maintainability.registry import bind_registry, load_registry
 from project import write_project
 
 AXES = """
@@ -20,12 +20,14 @@ axes:
     authority:
       symbol: app.n
       path: src/app/n.py
-    verifies: []
+    verifies:
+      - tests/test_n.py
 """
 
 ENTRY_EMPTY = """
 code_roots:
   - src
+  - tests
 """
 
 
@@ -40,11 +42,13 @@ class VolumeDefaultTests(unittest.TestCase):
                     "src/app/n.py": "NAMES = ['x']\n",
                     "src/main.py": "from app import n\nprint(n.NAMES)\n",
                     "src/dead.py": "X = 1\nY = 2\n",
+                    "tests/test_n.py": "from app.n import NAMES\nassert NAMES\n",
                 },
             )
             reg = load_registry(root)
             corpus = build_corpus(root, reg.code_roots, reg.exclude)
-            u = volume(reg, corpus, headline=True)
+            bound = bind_registry(reg, corpus)
+            u = volume(bound, corpus, headline=True)
             dead = next(m for m in corpus.modules if m.path.name == "dead.py")
             main = next(m for m in corpus.modules if m.path.name == "main.py")
             self.assertGreater(u, 0.0)

@@ -9,5 +9,6 @@ artifacts:
   - product/status.yaml
 human:
   technical_depth: low
-  domains: [geo trivia]
+  domains:
+    - geo trivia
 w_baseline: 0.75

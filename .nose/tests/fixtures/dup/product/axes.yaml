@@ -29,6 +29,7 @@ axes:
       symbol: app.reports.build_report_format_registry
       path: src/app/reports.py
     verifies:
+      - tests/test_reports.py
     extra_sites:
 
   - id: cache
@@ -37,4 +38,4 @@ axes:
     shape: unknown
     status: dormant
     authority: null
-    verifies: []
+    verifies:

@@ -7,5 +7,5 @@ artifacts:
   - product/status.yaml
 human:
   technical_depth: low
-  domains: []
+  domains:
 w_baseline: null

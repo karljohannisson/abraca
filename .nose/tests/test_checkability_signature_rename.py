@@ -6,7 +6,7 @@ from pathlib import Path
 
 from maintainability.atoms import score_atoms
 from maintainability.corpus import build_corpus
-from maintainability.registry import load_registry
+from maintainability.registry import bind_registry, load_registry
 from project import write_project
 
 AXES = """
@@ -76,7 +76,8 @@ def _score(tmp: str, axes: str) -> int:
     )
     reg = load_registry(root)
     corpus = build_corpus(root, reg.code_roots, reg.exclude)
-    return score_atoms(reg, corpus, headline=True).per_axis[0].V
+    bound = bind_registry(reg, corpus)
+    return score_atoms(bound, corpus, headline=True).per_axis[0].V
 
 
 class SignatureRenameCheckabilityTests(unittest.TestCase):
@@ -107,7 +108,8 @@ class SignatureRenameCheckabilityTests(unittest.TestCase):
             )
             reg = load_registry(root)
             corpus = build_corpus(root, reg.code_roots, reg.exclude)
-            self.assertEqual(score_atoms(reg, corpus, headline=True).per_axis[0].V, 2)
+            bound = bind_registry(reg, corpus)
+            self.assertEqual(score_atoms(bound, corpus, headline=True).per_axis[0].V, 2)
 
 
 if __name__ == "__main__":

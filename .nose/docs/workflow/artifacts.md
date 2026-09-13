@@ -45,7 +45,7 @@ Templates: [templates/](templates/).
 
 Exactly one authority per locked row, filled in Phase 4. Members live in code, not yaml.
 
-`entry-points.yaml`: `code_roots`, `exclude` (the loader always adds `.nose` when that directory exists at the product root), `entry_points`, optional `confirmed_live`, `deployables`. Run from product root: `PYTHONPATH=.nose python3 -m maintainability`. Python grains: [measure/python.md](../measure/python.md).
+`entry-points.yaml`: `code_roots`, `exclude` (the loader always adds `.nose` when that directory exists at the product root), `entry_points`, optional `confirmed_live`, `deployables`. Run from product root: `PYTHONPATH=.nose python3 -m maintainability`. Python grains: [measure/python.md](../measure/python.md). Module qnames are relative to packaging import roots (uv `module-root` or `src/`), not a stripped `src` prefix. Product yaml is block lists and block maps only. An unresolved live `authority` or `verifies` path is CLI exit 2.
 
 ## Layout after a clone
 

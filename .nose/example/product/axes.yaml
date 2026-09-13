@@ -10,7 +10,8 @@ axes:
     p: 0.75
     shape: set_grows
     status: locked
-    requirements: [FR-1]
+    requirements:
+      - FR-1
     authority:
       symbol: world.regions
       path: src/world/regions.py
@@ -23,4 +24,4 @@ axes:
     shape: unknown
     status: dormant
     authority: null
-    verifies: []
+    verifies:

@@ -4,6 +4,8 @@
 
 You implement **this task only**. Then you stop.
 
+Worktrees live at `worktrees/<task-id>` inside the product repo. Never write outside the repo root.
+
 Principles: [../principles/README.md](../principles/README.md). Combined \(W\): [../metric.md](../metric.md).
 
 ## Code rules

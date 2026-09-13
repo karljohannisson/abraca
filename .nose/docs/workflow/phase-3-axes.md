@@ -23,7 +23,7 @@ This artifact **is** the maintainability registry. Phase 4 cannot measure withou
 
 5. Shape, in their words, then you store the enum ([artifacts.md](artifacts.md)): another of the same kind → `set_grows`; different kind that needs its own handling → `new_variant`; look/wording/formula → `formula_value`; rename/fields → `signature_rename`; don’t know yet → `unknown` + `dormant`.
 6. Now / later / never: later = `dormant` (no code in Phase 4); never = Frozen, not a row; now = `locked`.
-7. Link each row to Phase 2 ids (`requirements: [FR-3, DR-1]`). That is why the axis exists, not a uses-map.
+7. Link each row to Phase 2 ids with a block list under `requirements:`. That is why the axis exists, not a uses-map.
 8. Recap **only the list of reasons** in ordinary language, mark inferred ones, wait. Then write `product/axes.yaml`.
 
 Do not implement a framework because “this often changes.” Do not write `src/`.
@@ -41,7 +41,7 @@ Do not implement a framework because “this often changes.” Do not write `src
 
 ## `product/axes.yaml`
 
-Every row: `id`, `plain`, `statement`, `because`, `origin` (`brief` · `human` · `inferred`), `frequency`, `p`, `shape`, `status` (`locked` · `dormant`), `requirements`, `authority: null` (Phase 4 fills it), `verifies: []`.
+Every row: `id`, `plain`, `statement`, `because`, `origin` (`brief` · `human` · `inferred`), `frequency`, `p`, `shape`, `status` (`locked` · `dormant`), `requirements`, `authority: null` (Phase 4 fills it), `verifies:` with no children when empty. Block lists and block maps only.
 
 No leftover `proposed` after the recap. No two locked rows that only change together. No frozen reason as a row.
 

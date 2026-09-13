@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import ast
 import sys
+import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
 from maintainability.model import Corpus, Mod, Unit
+from maintainability.registry import BoundAuthority
 
 LANGUAGE = "python"
 WORKING_SET = 15
@@ -19,13 +21,18 @@ class Payload:
     tree: ast.Module
 
 
-def parse_file(path: Path, root: Path) -> Mod | None:
+@dataclass(frozen=True)
+class ImportRoot:
+    path: Path
+
+
+def parse_file(path: Path, root: Path, import_roots: tuple[ImportRoot, ...]) -> Mod | None:
     try:
         source = path.read_text(encoding="utf-8")
         tree = ast.parse(source, filename=str(path))
     except (SyntaxError, UnicodeDecodeError):
         return None
-    qname = module_qname(root, path)
+    qname = module_qname(path, repo_root=root, import_roots=import_roots)
     mod = Mod(
         path=path,
         qname=qname,
@@ -38,11 +45,72 @@ def parse_file(path: Path, root: Path) -> Mod | None:
     return mod
 
 
-def module_qname(root: Path, path: Path) -> str:
-    rel = path.resolve().relative_to(root)
+def discover_import_roots(repo_root: Path) -> tuple[ImportRoot, ...]:
+    repo_root = repo_root.resolve()
+    pyproject = repo_root / "pyproject.toml"
+    if pyproject.is_file():
+        data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+        workspace = (data.get("tool") or {}).get("uv") or {}
+        workspace = workspace.get("workspace") or {}
+        if "members" in workspace:
+            roots: list[ImportRoot] = []
+            for member in _expand_members(repo_root, workspace.get("members") or []):
+                roots.append(ImportRoot(_project_import_root(member)))
+            return tuple(roots)
+    return (ImportRoot(_project_import_root(repo_root)),)
+
+
+def _expand_members(repo_root: Path, patterns) -> list[Path]:
+    if isinstance(patterns, str):
+        patterns = [patterns]
+    out: list[Path] = []
+    seen: set[Path] = set()
+    for pat in patterns:
+        text = str(pat)
+        if any(ch in text for ch in "*?["):
+            matches = sorted(repo_root.glob(text))
+        else:
+            matches = [repo_root / text]
+        for m in matches:
+            rp = m.resolve()
+            if rp.is_dir() and rp not in seen:
+                seen.add(rp)
+                out.append(rp)
+    return out
+
+
+def _project_import_root(project: Path) -> Path:
+    pyproject = project / "pyproject.toml"
+    if pyproject.is_file():
+        data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+        backend = ((data.get("tool") or {}).get("uv") or {}).get("build-backend") or {}
+        if "module-root" in backend:
+            mr = backend["module-root"]
+            return project if mr == "" else project / str(mr)
+    src = project / "src"
+    if src.is_dir():
+        return src
+    return project
+
+
+def module_qname(path: Path, *, repo_root: Path, import_roots: tuple[ImportRoot, ...]) -> str:
+    path = path.resolve()
+    repo_root = repo_root.resolve()
+    matched: Path | None = None
+    for root in import_roots:
+        rp = root.path.resolve()
+        try:
+            path.relative_to(rp)
+        except ValueError:
+            continue
+        if matched is None or len(rp.parts) > len(matched.parts):
+            matched = rp
+    base = matched if matched is not None else repo_root
+    try:
+        rel = path.relative_to(base)
+    except ValueError:
+        rel = Path(path.name)
     parts = list(rel.with_suffix("").parts)
-    if parts and parts[0] == "src":
-        parts = parts[1:]
     if parts and parts[-1] == "__init__":
         parts = parts[:-1]
     return ".".join(parts) or path.stem
@@ -422,8 +490,11 @@ def token_hits(mod: Mod, members: set[str]) -> list[tuple[int, str, str]]:
     return hits
 
 
-def authority_aliases(corpus: Corpus, auth_qname: str) -> dict[Path, set[str]]:
+def authority_aliases(corpus: Corpus, auth: BoundAuthority) -> dict[Path, set[str]]:
     aliases: dict[Path, set[str]] = {}
+    mod_q = auth.module.qname
+    symbol = auth.symbol
+    tail = _symbol_tail(symbol, mod_q)
     for mod in corpus.modules:
         if mod.language != LANGUAGE:
             continue
@@ -434,21 +505,30 @@ def authority_aliases(corpus: Corpus, auth_qname: str) -> dict[Path, set[str]]:
         for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom):
                 modname = abs_import(mod.qname, node)
-                if modname == auth_qname or (modname or "").startswith(auth_qname + "."):
+                if modname == mod_q or (modname or "").startswith(mod_q + "."):
                     for alias in node.names:
                         names.add(alias.asname or alias.name)
-                if modname and auth_qname.startswith(modname + "."):
-                    tail = auth_qname[len(modname) + 1 :].split(".")[0]
+                if modname and (mod_q.startswith(modname + ".") or symbol.startswith(modname + ".")):
+                    want = (mod_q[len(modname) + 1 :] if mod_q.startswith(modname + ".") else tail)
+                    want = want.split(".")[0] if want else ""
                     for alias in node.names:
-                        if alias.name == tail:
+                        if want and alias.name == want:
                             names.add(alias.asname or alias.name)
             elif isinstance(node, ast.Import):
                 for alias in node.names:
                     n = alias.name
-                    if n == auth_qname or auth_qname.startswith(n + "."):
+                    if n == mod_q or n == symbol or mod_q.startswith(n + ".") or symbol.startswith(n + "."):
                         names.add(alias.asname or n.split(".")[0])
         aliases[mod.path] = names
     return aliases
+
+
+def _symbol_tail(symbol: str, mod_q: str) -> str:
+    if symbol == mod_q:
+        return ""
+    if symbol.startswith(mod_q + "."):
+        return symbol[len(mod_q) + 1 :]
+    return ""
 
 
 def abs_import(mod_qname: str, node: ast.ImportFrom) -> str | None:
@@ -489,52 +569,57 @@ def string_in_use_context(mod: Mod, lineno: int, aliases: dict[Path, set[str]]) 
     return False
 
 
-def mentions(mod: Mod, auth_qname: str) -> bool:
-    if not auth_qname:
-        return False
+def mentions(mod: Mod, auth: BoundAuthority) -> bool:
+    mod_q = auth.module.qname
+    symbol = auth.symbol
+    tail = _symbol_tail(symbol, mod_q)
     tree = _tree(mod)
     if tree is None:
         return False
     for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom) and node.module:
-            if node.module == auth_qname or node.module.startswith(auth_qname + "."):
+        if isinstance(node, ast.ImportFrom):
+            imported = abs_import(mod.qname, node)
+            if imported == mod_q or (imported or "").startswith(mod_q + "."):
                 return True
-            tail = auth_qname.split(".")[-1]
-            if node.module.endswith("." + ".".join(auth_qname.split(".")[:-1]) or "") or any(
-                a.name == tail for a in node.names
-            ):
-                if auth_qname.startswith((node.module or "") + ".") or node.module == ".".join(
-                    auth_qname.split(".")[:-1]
-                ):
+            if imported and (mod_q.startswith(imported + ".") or symbol.startswith(imported + ".")):
+                want = tail.split(".")[0] if tail else mod_q[len(imported) + 1 :].split(".")[0]
+                if want and any(a.name == want for a in node.names):
                     return True
         if isinstance(node, ast.Import):
-            if any(a.name == auth_qname or auth_qname.startswith(a.name + ".") for a in node.names):
+            if any(
+                a.name == mod_q
+                or a.name == symbol
+                or mod_q.startswith(a.name + ".")
+                or symbol.startswith(a.name + ".")
+                for a in node.names
+            ):
                 return True
-    return auth_qname.split(".")[-1] in mod.source and any(
-        auth_qname.split(".")[-1] == a.name
-        for node in ast.walk(tree)
-        if isinstance(node, ast.ImportFrom)
-        for a in node.names
-    )
+    return False
 
 
-def reads_authority(mod: Mod, auth_qname: str) -> bool:
+def reads_authority(mod: Mod, auth: BoundAuthority) -> bool:
     tree = _tree(mod)
     if tree is None:
         return False
+    mod_q = auth.module.qname
+    symbol = auth.symbol
+    tail = _symbol_tail(symbol, mod_q)
     aliases: set[str] = set()
     for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom) and node.module:
-            if node.module == auth_qname or (
-                node.module == ".".join(auth_qname.split(".")[:-1])
-                and any(a.name == auth_qname.split(".")[-1] for a in node.names)
-            ):
+        if isinstance(node, ast.ImportFrom):
+            imported = abs_import(mod.qname, node)
+            if imported == mod_q or (imported or "").startswith(mod_q + "."):
                 for a in node.names:
                     aliases.add(a.asname or a.name)
+            elif imported and (symbol.startswith(imported + ".") or mod_q.startswith(imported + ".")):
+                want = tail.split(".")[0] if tail else mod_q[len(imported) + 1 :].split(".")[0]
+                for a in node.names:
+                    if want and a.name == want:
+                        aliases.add(a.asname or a.name)
         if isinstance(node, ast.Import):
             for a in node.names:
-                if a.name == auth_qname:
-                    aliases.add(a.asname or a.name.split(".")[-1])
+                if a.name == mod_q or a.name == symbol:
+                    aliases.add(a.asname or a.name.split(".")[0])
     if not aliases:
         return False
     for node in ast.walk(tree):

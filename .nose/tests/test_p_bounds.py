@@ -10,7 +10,7 @@ from project import write_project
 ENTRY = """
 code_roots:
   - src
-entry_points: []
+entry_points:
 """
 
 
@@ -26,7 +26,7 @@ axes:
     authority:
       symbol: app.n
       path: src/app/n.py
-    verifies: []
+    verifies:
 """
 
 

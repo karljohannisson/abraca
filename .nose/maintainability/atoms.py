@@ -8,7 +8,7 @@ from pathlib import Path
 
 from maintainability import languages as lang
 from maintainability.model import Corpus, Mod
-from maintainability.registry import Axis, Registry
+from maintainability.registry import BoundAxis, BoundRegistry
 from maintainability.sites import STRENGTH_RANK, Site, sites_for_axis, unit_of_site
 
 STOPWORDS = frozenset(
@@ -55,9 +55,9 @@ class AtomTotals:
     label: str = "headline"
 
 
-def score_atoms(registry: Registry, corpus: Corpus, headline: bool) -> AtomTotals:
+def score_atoms(registry: BoundRegistry, corpus: Corpus, headline: bool) -> AtomTotals:
     site_map: dict[str, list[Site]] = {
-        ax.id: sites_for_axis(ax, registry, corpus, headline) for ax in registry.live_axes()
+        ax.id: sites_for_axis(ax, registry, corpus, headline) for ax in registry.axes
     }
     mixing_units: dict[str, set[str]] = {}
     for ax_id, slist in site_map.items():
@@ -66,7 +66,7 @@ def score_atoms(registry: Registry, corpus: Corpus, headline: bool) -> AtomTotal
 
     per: list[AxisScore] = []
     D = Lsum = Ssum = Zsum = Csum = Msum = Hsum = Fsum = Vsum = 0.0
-    for ax in registry.live_axes():
+    for ax in registry.axes:
         sites = site_map[ax.id]
         k = len(sites)
         extras = max(k - 1, 0)
@@ -77,7 +77,7 @@ def score_atoms(registry: Registry, corpus: Corpus, headline: bool) -> AtomTotal
         M = mean_mixing(sites, mixing_units, ax.id)
         H = mean_fanout(corpus, sites)
         F = findability(ax, corpus)
-        V = checkability(ax, registry, corpus)
+        V = checkability(ax, corpus)
         p = ax.p
         per.append(AxisScore(ax.id, p, k, extras, L, S, Z, C, M, H, F, V))
         D += p * extras
@@ -93,7 +93,7 @@ def score_atoms(registry: Registry, corpus: Corpus, headline: bool) -> AtomTotal
     return AtomTotals(D, Lsum, Ssum, Zsum, Csum, Msum, Hsum, Fsum, Vsum, u, per, "headline" if headline else "floor")
 
 
-def locality(registry: Registry, corpus: Corpus, sites: list[Site]) -> int:
+def locality(registry: BoundRegistry, corpus: Corpus, sites: list[Site]) -> int:
     if len(sites) <= 1:
         return 0
     paths = [_containment(registry, corpus, s) for s in sites]
@@ -204,7 +204,7 @@ def mean_fanout(corpus: Corpus, sites: list[Site]) -> float:
     return sum(xs) / len(xs)
 
 
-def findability(axis: Axis, corpus: Corpus) -> int:
+def findability(axis: BoundAxis, corpus: Corpus) -> int:
     tokens = query_tokens(axis)
     scored: list[tuple[tuple[int, int], str]] = []
     for qname, doc, _path in corpus.symbols:
@@ -212,43 +212,33 @@ def findability(axis: Axis, corpus: Corpus) -> int:
         m = sum(1 for t in tokens if t in doc.lower())
         scored.append(((-n, -m), qname))
     scored.sort(key=lambda x: (x[0], x[1]))
-    target = axis.authority_symbol or ""
-    if not target:
-        return 50
+    target = axis.authority.symbol
     for i, (_sc, qname) in enumerate(scored, start=1):
         if qname == target:
-            return min(i - 1, 50)
-    for i, (_sc, qname) in enumerate(scored, start=1):
-        if qname == target or qname.startswith(target + "."):
             return min(i - 1, 50)
     return 50
 
 
-def query_tokens(axis: Axis) -> list[str]:
+def query_tokens(axis: BoundAxis) -> list[str]:
     text = f"{axis.statement} {axis.id.replace('-', ' ')}"
     raw = re.findall(r"[a-z][a-z0-9]+", text.lower())
     return [t for t in raw if t not in STOPWORDS and len(t) > 1]
 
 
-def checkability(axis: Axis, registry: Registry, corpus: Corpus) -> int:
-    auth_path = (registry.root / axis.authority_path).resolve() if axis.authority_path else None
-    auth_mod = corpus.by_path.get(auth_path) if auth_path else None
-    auth_qname = auth_mod.qname if auth_mod else ""
+def checkability(axis: BoundAxis, corpus: Corpus) -> int:
+    auth = axis.authority
+    auth_mod = auth.module
     reads = False
     imports_mod = False
-    for rel in axis.verifies:
-        path = (registry.root / rel).resolve()
-        vmod = corpus.by_path.get(path)
-        if vmod is None:
-            continue
-        if lang.mentions(vmod, auth_qname):
+    for vmod in axis.verifies:
+        if lang.mentions(vmod, auth):
             imports_mod = True
-        if lang.reads_authority(vmod, auth_qname):
+        if lang.reads_authority(vmod, auth):
             reads = True
     fail_applies = axis.shape == "new_variant"
     exhaustive = True
     if fail_applies:
-        matches = lang.fail_loud_matches(corpus, auth_qname, auth_mod)
+        matches = lang.fail_loud_matches(corpus, auth.symbol, auth_mod)
         if not matches:
             fail_applies = False
         else:
@@ -281,7 +271,7 @@ def checkability(axis: Axis, registry: Registry, corpus: Corpus) -> int:
     return 3
 
 
-def volume(registry: Registry, corpus: Corpus, headline: bool) -> float:
+def volume(registry: BoundRegistry, corpus: Corpus, headline: bool) -> float:
     roots: list[Path] = []
     for ep in registry.entry_points:
         if not isinstance(ep, dict):
@@ -291,10 +281,10 @@ def volume(registry: Registry, corpus: Corpus, headline: bool) -> float:
             roots.append((registry.root / p).resolve())
     if not any(isinstance(ep, dict) and ep.get("path") for ep in registry.entry_points):
         roots.extend(lang.default_entry_paths(registry.root))
-    for ax in registry.live_axes():
-        roots.append((registry.root / ax.authority_path).resolve())
+    for ax in registry.axes:
+        roots.append(ax.authority.path)
         for v in ax.verifies:
-            roots.append((registry.root / v).resolve())
+            roots.append(v.path)
     qname_to_mod = {m.qname: m for m in corpus.modules}
     work = [p for p in roots if p in corpus.by_path]
     seen: set[Path] = set()

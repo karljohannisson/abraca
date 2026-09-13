@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from maintainability import languages as lang
-from maintainability.model import Corpus, Mod, Unit, enclosing_unit
-from maintainability.registry import Axis, Registry
+from maintainability.model import Corpus, Unit, enclosing_unit
+from maintainability.registry import BoundAxis, BoundRegistry
 
 STRENGTH_RANK = {"name": 0, "meaning": 1, "position": 2, "algorithm": 3, "dynamic": 4}
 
@@ -23,25 +23,10 @@ class Site:
     is_authority: bool
 
 
-def _authority_unit(mod: Mod, axis: Axis) -> Unit:
-    """The enclosing unit of authority.symbol; module body when no unit matches."""
-    symbol = axis.authority_symbol
-    if not symbol:
-        return next(u for u in mod.units if u.kind == "module")
-    for u in mod.units:
-        if u.qname == symbol:
-            return u
-    return next(u for u in mod.units if u.kind == "module")
-
-
-def sites_for_axis(axis: Axis, registry: Registry, corpus: Corpus, headline: bool) -> list[Site]:
-    if not axis.authority_path:
-        return []
-    auth_path = (registry.root / axis.authority_path).resolve()
-    mod = corpus.by_path.get(auth_path)
-    if mod is None:
-        return []
-    auth_unit = _authority_unit(mod, axis)
+def sites_for_axis(axis: BoundAxis, registry: BoundRegistry, corpus: Corpus, headline: bool) -> list[Site]:
+    auth_unit = axis.authority.unit
+    auth_path = axis.authority.path
+    mod = axis.authority.module
     out = [
         Site(
             axis.id,
@@ -54,7 +39,7 @@ def sites_for_axis(axis: Axis, registry: Registry, corpus: Corpus, headline: boo
         )
     ]
     members = lang.seed_members(mod)
-    aliases = lang.authority_aliases(corpus, mod.qname)
+    aliases = lang.authority_aliases(corpus, axis.authority)
     seen_units = {auth_unit.qname}
 
     def _in_authority(qname: str) -> bool:

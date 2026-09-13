@@ -10,6 +10,7 @@ axes:
     p: 0.75
     shape: set_grows
     status: locked
-    requirements: [FR-1]
+    requirements:
+      - FR-1
     authority: null
-    verifies: []
+    verifies:

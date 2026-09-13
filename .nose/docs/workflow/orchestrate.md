@@ -78,7 +78,7 @@ Never jump 1 → 4. Never write `src/` in 1–3.
 
 1. Cold Phase 4 agent runs [phase-4-plan.md](phase-4-plan.md): write `product/phase-4-plan.md`, **lint the plan**, create empty `product/decisions.md` if needed. Do not code.
 2. Copy the **next undone task only** into `product/current-task.md` (never hand the whole plan to a task agent). Set `next_instructions` to [phase-4-task.md](phase-4-task.md). `artifacts`: status, current-task, axes, decisions, entry-points if it exists.
-3. Run **one** task agent. It commits, appends decisions, records \(W\).
+3. Run **one** task agent. It commits, appends decisions, records \(W\). If two task agents in one wave both edit `product/*.yaml`, diff those files before advancing.
 4. If the task failed or \(W\) rose without a logged reason: do not start the next task; fix or replan.
 5. **Slice checkpoint.** After the first few authority tasks are done (before any composition/UI task): stop and ship a thin runnable vertical — one screen, one command the human can run. Set `status: waiting_human` with `waiting_on: slice_accept`, tell the human how to run it in their words, and run no further tasks until they try it and accept. If they reject, rewind (plan or Phase 2/3) while it is still cheap.
 6. Repeat 2–4 until the plan is done, then Phase 5.
