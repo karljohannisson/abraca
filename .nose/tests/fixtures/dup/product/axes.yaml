@@ -1,7 +1,10 @@
 version: 1
 axes:
   - id: countries
+    plain: The list of countries may grow.
     statement: The set of country codes may grow.
+    because: New countries can be added without changing anything else.
+    origin: brief
     p: high
     shape: set_grows
     status: locked
@@ -14,3 +17,11 @@ axes:
       - path: src/app/clone.py
         status: confirmed
         strength: meaning
+
+  - id: cache
+    statement: Caching may be added.
+    p: low
+    shape: unknown
+    status: dormant
+    authority: null
+    verifies: []

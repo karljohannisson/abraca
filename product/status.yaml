@@ -1,0 +1,11 @@
+version: 1
+phase: 1
+phase_name: brainstorm
+status: not_started
+next_instructions: .nose/docs/workflow/phase-1-brainstorm.md
+artifacts:
+  - product/status.yaml
+human:
+  technical_depth: low
+  domains: []
+w_baseline: null

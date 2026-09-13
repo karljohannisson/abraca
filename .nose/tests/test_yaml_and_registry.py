@@ -1,4 +1,4 @@
-"""Load this repo's product yaml."""
+"""Load a product registry from the dup fixture (not a live app)."""
 
 from pathlib import Path
 
@@ -6,28 +6,24 @@ from maintainability.registry import load_registry
 from maintainability.yaml_lite import load
 
 
-ROOT = Path(__file__).resolve().parents[2]
+FIX = Path(__file__).resolve().parent / "fixtures" / "dup"
 
 
-def test_axes_yaml_has_locked_providers() -> None:
-    text = (ROOT / "product/axes.yaml").read_text(encoding="utf-8")
+def test_fixture_axes_parse() -> None:
+    text = (FIX / "product/axes.yaml").read_text(encoding="utf-8")
     data = load(text)
     ids = [a["id"] for a in data["axes"]]
-    assert "providers" in ids
-    providers = next(a for a in data["axes"] if a["id"] == "providers")
-    assert providers["p"] == "high"
-    assert providers["authority"]["symbol"] == "chat.api.providers"
-    assert "tests/test_providers.py" in providers["verifies"]
-    assert providers["origin"] == "brief"
-    protocols = next(a for a in data["axes"] if a["id"] == "protocols")
-    assert protocols["origin"] == "inferred"
-    assert "plain" in protocols
-    assert "because" in protocols
+    assert "countries" in ids
+    countries = next(a for a in data["axes"] if a["id"] == "countries")
+    assert countries["p"] == "high"
+    assert countries["authority"]["symbol"] == "app.countries"
+    assert "tests/test_countries.py" in countries["verifies"]
+    assert countries.get("origin") == "brief"
 
 
-def test_registry_skips_dormant_cache() -> None:
-    reg = load_registry(ROOT)
+def test_registry_skips_dormant() -> None:
+    reg = load_registry(FIX)
     live = {a.id for a in reg.live_axes()}
-    assert "providers" in live
+    assert "countries" in live
     assert "cache" not in live
-    assert any(p.name == "chat" for p in reg.code_roots)
+    assert any(p.name == "src" or p.name == "app" for p in reg.code_roots)

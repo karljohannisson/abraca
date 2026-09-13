@@ -7,7 +7,7 @@ Hand the **finished v1** to the human in their language. They do not read yaml.
 ## Do
 
 1. Run `PYTHONPATH=.nose python3 -m maintainability`. Hunt extras; delete if any slipped through. Claimable: verifies pass, no dormant/frozen code, no leftover hunt hits, headline \(W\) understood vs baseline ([metric.md](../metric.md) “What \(W\) can claim”).
-2. Write `product/phase-5.md`: how to start the program; what it does (Phase 2 ids, in their words); what was parked; inferred axes you designed for, in their words; \(W\) in **one sentence** if it is not ~0 (“there is still one awkward name to find the chat entry point”); decisions that affect them.
+2. Write `product/phase-5.md`: how to start the program; what it does (Phase 2 ids, in their words); what was parked; inferred axes you designed for, in their words; \(W\) in **one sentence** if it is not ~0 (“one name is still a bit hard to find”); decisions that affect them.
 3. Ask them to try it. **Accept** or **complain**.
 
 ## If they accept
