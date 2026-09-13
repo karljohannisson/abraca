@@ -39,3 +39,10 @@ tests too: `cd .nose/example && PYTHONPATH=src python3 -m unittest discover -s t
 
 A fresh clone does **not** copy this tree; its `product/` starts empty at
 `phase: 1`. This tree exists to imitate, not to seed.
+
+## Later change-tasks (eval)
+
+After this run reached Phase 5, two follow-on change tasks (add a region;
+change wording) plus an eval recording table live in
+[eval/change-tasks.md](eval/change-tasks.md) — execute those to measure how
+expensive the *next* change is.
