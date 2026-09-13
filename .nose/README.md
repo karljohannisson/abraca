@@ -11,7 +11,9 @@ Start: [docs/README.md](docs/README.md). Orchestration: [docs/workflow/orchestra
 | `docs/metric.md` — combined \(W\) | `tests/` — product `verifies` |
 | `docs/measure/` — Python backend notes | |
 | `maintainability/` — `python -m maintainability` | |
+| `planlint/` — `python -m planlint` | |
 | `tests/` — tests for that metric | |
+| `example/` — a finished tiny run to imitate (not part of a fresh product) | |
 
 From the **product root**:
 

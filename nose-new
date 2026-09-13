@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# nose-new — install the nose seed into a fresh project folder.
+#
+# Usage:
+#   nose-new <name>          # create ./<name>/ (fails if it exists and is non-empty)
+#   nose-new <name> <dir>    # create <dir>/<name>/
+#
+# What it does:
+#   1. Copies AGENTS.md and .nose/ from this repo (the seed) into the new dir.
+#   2. git init + initial commit, so the workflow's commits start clean.
+#   3. Leaves product/ empty — Phase 1 starts from your first conversation.
+#
+# The seed is copied, not linked: the new project owns its copy, so later
+# changes to this repo do not silently mutate products in flight.
+set -euo pipefail
+
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [[ $# -lt 1 || $# -gt 2 ]]; then
+  echo "usage: nose-new <name> [parent-dir]" >&2
+  exit 64
+fi
+
+NAME="$1"
+PARENT="${2:-.}"
+SRC="$SELF_DIR"
+DEST="$PARENT/$NAME"
+
+if [[ ! -f "$SRC/AGENTS.md" || ! -d "$SRC/.nose" ]]; then
+  echo "error: $SRC does not look like the nose seed (need AGENTS.md and .nose/)" >&2
+  exit 66
+fi
+
+if [[ -e "$DEST" ]]; then
+  echo "error: $DEST already exists" >&2
+  exit 73
+fi
+
+mkdir -p "$DEST"
+cp -R "$SRC/.nose" "$DEST/.nose"
+cp "$SRC/AGENTS.md" "$DEST/AGENTS.md"
+rm -rf "$DEST"/.nose/**/__pycache__ "$DEST"/.nose/**/tests/__pycache__ 2>/dev/null || true
+find "$DEST/.nose" -name __pycache__ -type d -exec rm -rf {} + 2>/dev/null || true
+
+# Seed git so task commits start from a clean, empty history.
+if command -v git >/dev/null 2>&1; then
+  git -C "$DEST" init -q
+  git -C "$DEST" add -A
+  git -C "$DEST" commit -q -m "seed: nose maintainability companion" --allow-empty
+fi
+
+cat <<EOF
+
+nose installed in $DEST
+
+Next: open the folder with a coding agent and talk about what you want to build.
+The agent reads AGENTS.md and runs the phases. You just talk.
+
+Example product for reference (do not copy into this one): $SRC/.nose/example/
+EOF
