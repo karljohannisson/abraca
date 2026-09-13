@@ -1,12 +1,14 @@
 """Tests for planlint (fixtures under tests/fixtures)."""
 
+import tempfile
 import unittest
 from pathlib import Path
 
-from planlint import lint
+from planlint import lint, main
 
 HERE = Path(__file__).parent
 AXES = HERE / "fixtures" / "axes.yaml"
+NOSE = HERE.parents[1]
 
 from maintainability.yaml_lite import load as yaml_load
 
@@ -58,6 +60,32 @@ class PlanLintTests(unittest.TestCase):
     def test_no_tasks_at_all_fails_for_locked_axes(self):
         errors = lint("# empty plan\n", self.axes)
         self.assertEqual(len(errors), 2)
+
+    def test_bullet_encodes_from_template_shape(self):
+        plan = (
+            "## T001 — a\n\n- encodes: [example]\n- uses: []\n\n"
+            "## T002 — b\n\n- encodes: [other]\n"
+        )
+        self.assertEqual(lint(plan, self.axes), [])
+
+    def test_main_accepts_registry_axes_map(self):
+        axes_text = (
+            "version: 1\n"
+            "axes:\n"
+            "  - id: example\n    status: locked\n"
+            "  - id: other\n    status: locked\n"
+            "  - id: dormant-thing\n    status: dormant\n"
+        )
+        with tempfile.TemporaryDirectory() as d:
+            axes_path = Path(d) / "axes.yaml"
+            axes_path.write_text(axes_text, encoding="utf-8")
+            plan = HERE / "fixtures" / "plan_pass.md"
+            self.assertEqual(main([str(plan), "--axes", str(axes_path)]), 0)
+
+    def test_main_lints_the_recorded_example(self):
+        plan = NOSE / "example" / "product" / "phase-4-plan.md"
+        axes = NOSE / "example" / "product" / "axes.yaml"
+        self.assertEqual(main([str(plan), "--axes", str(axes)]), 0)
 
 
 if __name__ == "__main__":

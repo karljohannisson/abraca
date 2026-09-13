@@ -1,6 +1,6 @@
 # Plan lint as a small checker
 
-Status: **parked**. Medium-high Goal 0 impact, low effort.
+Status: **partial**. `.nose/planlint/` landed 2026-09-13. Open: [bugs/planlint-axes-must-be-a-list.md](../bugs/planlint-axes-must-be-a-list.md), [bugs/planlint-ignores-template-encodes.md](../bugs/planlint-ignores-template-encodes.md).
 
 **Why.** Architecture is one encode task per locked axis. That rule is seven markdown checkboxes. Agents skip them.
 
