@@ -13,7 +13,8 @@ This is **not** a class-design essay. The architecture **is** one authority per 
 3. No task for `dormant` or Frozen. No task encodes two axes. No task recopies members.
 4. Cover every non-parked `FR`/`TR`/`DR`/`XR`. If a requirement is not reachable from the task list, add a task or park the requirement (that is a Phase 2 defect — rewind if you cannot map it without a human).
 5. Order: layout / `entry-points.yaml` (exclude `.nose`) → **all authority tasks** → composition → UI → glue. Never UI before the authorities it would have to recopy.
-6. Each task stands alone in a new context: acceptance criteria, W gate, **only** the artifact paths it needs, requirement ids, axis ids.
+6. **Slice checkpoint is part of the plan**: after the first few authority tasks and before the first composition task, the plan must place a thin runnable vertical — the smallest set of tasks that yields one screen the human can run with one command. The orchestrator stops there for human try/accept before continuing (see [phase-4-task.md](phase-4-task.md), "Orchestrator after this task").
+7. Each task stands alone in a new context: acceptance criteria, W gate, **only** the artifact paths it needs, requirement ids, axis ids.
 
 Template: [templates/plan.md](templates/plan.md). Decision log starts empty: [templates/decisions.md](templates/decisions.md).
 
@@ -26,6 +27,7 @@ Template: [templates/plan.md](templates/plan.md). Decision log starts empty: [te
 - [ ] Each task has: id, depends-on, requirement ids, encodes/uses, acceptance, `artifacts_to_load`, verify steps, commit message pattern `Tnnn: …`.
 - [ ] Acceptance includes: tests; hunt extras of every locked axis touched and delete them; `PYTHONPATH=.nose python3 -m maintainability` (exit 0); headline \(W\) ≤ `w_baseline` (or first run sets baseline) unless `decisions.md` records why and that it is required by a Phase 2 id.
 - [ ] Tasks do not include the whole of `phase-2.md` in `artifacts_to_load` — only cited ids (copy those sections into the task card so the task agent need not read the rest).
+- [ ] A slice checkpoint exists: the first few authority tasks, then a thin runnable vertical (one screen, one command), then the rest.
 
 If lint fails, fix the plan. Do not start tasks.
 

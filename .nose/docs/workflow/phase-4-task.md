@@ -44,3 +44,5 @@ Do not start the next task.
 ## Orchestrator after this task
 
 If failed or extras remain or unexplained \(W\) rise: fix or replan; do not advance. If ok: overwrite `product/current-task.md` with the next undone task, keep `next_instructions` on this file, reset. When no tasks remain: Phase 5 (`phase-5-handover.md`; artifacts include plan, decisions, entry-points, phase-1, phase-2, axes — not current-task).
+
+**Slice checkpoint (mandatory, human-gated).** When the tasks just done complete the plan's thin runnable vertical (first few authority tasks — before any composition/UI task): do not copy the next task. Set `status: waiting_human`, `waiting_on: slice_accept`, and tell the human — in their words — the one command to run and the one screen to look at. Run no further tasks until they try it and accept; then continue with the next task. If they reject, treat it as failed: rewind to the plan, Phase 3, or Phase 2 while the change is still cheap.
