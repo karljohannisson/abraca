@@ -1,0 +1,9 @@
+version: 1
+code_roots:
+  - src
+  - tests
+entry_points:
+  - id: main
+    symbol: world.__main__:main
+    path: src/world/__main__.py
+    kind: program_start
